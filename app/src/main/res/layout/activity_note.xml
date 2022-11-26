@@ -8,35 +8,40 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        android:layout_width="411dp"
-        android:layout_height="96dp"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+
+
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/return_button"
-        android:layout_width="59dp"
-        android:layout_height="68dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_margin="10dp"
+        android:background="#009DD3"
         android:gravity="center|fill_vertical"
+        android:src="@drawable/ic_return_foreground"
         android:text="Return"
         app:layout_constraintStart_toStartOf="@+id/toolbar"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <LinearLayout
         android:id="@+id/notes_layout"
-        android:layout_width="400dp"
-        android:layout_height="552dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
@@ -93,8 +98,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:baselineAligned="false">
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
@@ -122,8 +127,8 @@
                     android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/button_add_reminder"
-                        android:layout_width="0dp"
+                        android:id="@+id/button_add_reminder3"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="10dp"
@@ -132,8 +137,11 @@
                         android:layout_weight="1"
                         android:width="50dp"
                         android:text="Przypomnienie +"
-                        android:textSize="14sp"
-                        app:cornerRadius="20dp" />
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        app:layout_column="0"
+                        app:layout_row="0" />
 
                 </LinearLayout>
 
@@ -153,8 +161,9 @@
                         android:layout_weight="1"
                         android:width="50dp"
                         android:text="Etykieta +"
-                        android:textSize="14sp"
-                        app:cornerRadius="20dp" />
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        tools:textAllCaps="false" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -181,30 +190,86 @@
     </LinearLayout>
 
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="411dp"
-        android:layout_height="90dp"
-        android:gravity="bottom"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintEnd_toEndOf="@+id/notes_layout"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
-            android:id="@+id/accept_button"
-            android:layout_width="59dp"
-            android:layout_height="68dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center|fill_vertical"
-            android:text="Add" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </RelativeLayout>
+            <ImageButton
+                android:id="@+id/photo_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="#009DD3"
+                android:gravity="center|fill_vertical"
+                android:src="@drawable/ic_baseline_photo_camera_24"
+                android:text="Add"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <ImageButton
+                android:id="@+id/voice_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="#009DD3"
+                android:gravity="center|fill_vertical"
+                android:src="@drawable/ic_baseline_mic_24"
+                android:text="Add"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/list_button"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <ImageButton
+                android:id="@+id/list_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="#009DD3"
+                android:gravity="center|fill_vertical"
+                android:src="@drawable/ic_baseline_checklist_24"
+                android:text="Add"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/image_buton"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <ImageButton
+                android:id="@+id/image_buton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="#009DD3"
+                android:gravity="center|fill_vertical"
+                android:src="@drawable/ic_baseline_image_24"
+                android:text="Add"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/photo_button"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <ImageButton
+                android:id="@+id/delete_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="#009DD3"
+                android:gravity="end"
+                android:src="@drawable/ic_baseline_delete_24"
+                android:text="Add"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="SpeakableTextPresentCheck" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
