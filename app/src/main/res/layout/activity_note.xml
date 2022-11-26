@@ -29,7 +29,7 @@
         android:layout_margin="10dp"
         android:background="#009DD3"
         android:gravity="center|fill_vertical"
-        android:src="@drawable/ic_return_foreground"
+        android:src="@drawable/ic_arrow_white_24px"
         android:text="Return"
         app:layout_constraintStart_toStartOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="parent"
