@@ -1,11 +1,35 @@
 package pl.notatki
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //Button dodawania notatki
+        val buttonAddNote = findViewById<Button>(R.id.add_note_button) as Button
+
+        //Styl dla notatki
+        val notatkaStyle = ContextThemeWrapper(baseContext, android.R.style.Theme)
+
+        buttonAddNote.setOnClickListener{
+            val note_card = CardView(notatkaStyle)
+            val note_title = TextView(this)
+            note_title.text = "Title"
+            val notes_layout = findViewById<LinearLayout>(R.id.notes_layout)
+            notes_layout.addView(note_card)
+
+            note_card.addView(note_title)
+        }
+
+
     }
 }
