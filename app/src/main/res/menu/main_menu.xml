@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/search"
+        android:title="Search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/notes"
+        android:title="Notatki"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/reminders"
+        android:title="Przypomnienia"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/labels"
+        android:title="Etykiety"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/archives"
+        android:title="Archiwum"
+        app:showAsAction="never" />
+
+
+
+</menu>
