@@ -33,7 +33,10 @@
         android:text="Return"
         app:layout_constraintStart_toStartOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="SpeakableTextPresentCheck" />
+        tools:ignore="SpeakableTextPresentCheck"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_baseline_add_24"
+        android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
     <LinearLayout
         android:id="@+id/notes_layout"
@@ -81,6 +84,7 @@
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:background="@color/backgroundColor"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:paddingBottom="1dp"
                         android:scaleType="centerInside"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -179,11 +183,11 @@
                             android:width="50dp"
                             android:backgroundTint="#8058D5D3"
                             android:text="Etykieta +"
+                            android:textAllCaps="false"
                             android:textSize="12sp"
                             app:cornerRadius="20dp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:textAllCaps="false" />
+                            app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
@@ -235,9 +239,11 @@
                 android:gravity="center|fill_vertical"
                 android:src="@drawable/ic_baseline_photo_camera_24"
                 android:text="Add"
+                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="SpeakableTextPresentCheck"
+                android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/voice_button"
@@ -245,25 +251,29 @@
                 android:layout_height="60dp"
                 android:layout_margin="10dp"
                 android:background="#009DD3"
+                android:clickable="true"
                 android:gravity="center|fill_vertical"
                 android:src="@drawable/ic_baseline_mic_24"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/list_button"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="SpeakableTextPresentCheck"
+                android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/list_button"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_margin="10dp"
+                android:clickable="true"
                 android:background="#009DD3"
                 android:gravity="center|fill_vertical"
                 android:src="@drawable/ic_baseline_checklist_24"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/image_buton"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="SpeakableTextPresentCheck"
+                android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/image_buton"
@@ -271,12 +281,14 @@
                 android:layout_height="60dp"
                 android:layout_margin="10dp"
                 android:background="#009DD3"
+                android:clickable="true"
                 android:gravity="center|fill_vertical"
                 android:src="@drawable/ic_baseline_image_24"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/photo_button"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="SpeakableTextPresentCheck"
+                android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/delete_button"
@@ -285,11 +297,13 @@
                 android:layout_margin="10dp"
                 android:background="#009DD3"
                 android:gravity="end"
+                android:clickable="true"
                 android:src="@drawable/ic_baseline_delete_24"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="SpeakableTextPresentCheck"
+                android:foreground="?attr/selectableItemBackgroundBorderless"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
