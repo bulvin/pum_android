@@ -3,16 +3,17 @@ package pl.notatki
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityMainBinding
-import pl.notatki.databinding.ItemMainBinding
+import pl.notatki.model.Note
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val adapter = MainAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,22 +23,30 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
+
         val buttonAddNote = binding.addNote
         buttonAddNote.setOnClickListener {
             val notePage = Intent(this, NoteActivity::class.java)
             startActivity(notePage)
+
+
         }
+        val note1 = Note(1,"Tytuł","Treść notatki",null,"",null)
+        note1.title = "Tytuł"
+        note1.content = "treść"
+        val note2 = Note(2,"Tytuł","Treść notatki",null,"",null)
+       var arrList = arrayListOf<Note>()
+
+      arrList.add(note1)
+        arrList.add(note2)
+        adapter.submitList(arrList)
 
         //Button dodawania notatki
         //val buttonAddNote = findViewById<Button>(R.id.add_note_button) as Button
 
-       var textView: TextView
-       textView = findViewById(R.id.noteTitle)
-        textView.text = "Tytuł"
 
-        var textView2: TextView
-        textView2 = findViewById(R.id.noteContent)
-        textView2.text = "Treść notatki"
 
 
 
