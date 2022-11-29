@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         val note2 = Note(2,"Tytuł","Treść notatki",null,"",null)
        var arrList = arrayListOf<Note>()
 
+
+
       arrList.add(note1)
         arrList.add(note2)
         adapter.submitList(arrList)

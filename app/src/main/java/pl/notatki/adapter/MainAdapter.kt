@@ -1,10 +1,15 @@
 package pl.notatki.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import pl.notatki.R
 import pl.notatki.databinding.ItemMainBinding
 import pl.notatki.model.Note
 
@@ -19,6 +24,7 @@ class MainAdapter : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         holder.bindTo(getItem(position))
+
     }
 
 }
@@ -27,10 +33,17 @@ class MainViewHolder(private val binding: ItemMainBinding) : RecyclerView.ViewHo
 
         fun bindTo(note: Note){
             binding.noteTitle.text = "Tytuł"
-            binding.noteContent.text = "Treść notatki Treść notatkiTreść notatkiTreść notatki"
-            binding.noteLabel.text = "Przykładowa etykieta"
-            binding.noteReminder.text = "28 lis 2022, 18:00"
+            binding.noteContent.text = "Treść notatki"
+            binding.noteLabel.text = "Etykieta"
+            binding.noteReminder.text = "29 lis 2022, 18:00"
+
+
+            Glide.with(itemView)
+                .load(R.drawable.img)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.noteImg)
         }
+
 
 
 }
