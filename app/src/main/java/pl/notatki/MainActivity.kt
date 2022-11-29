@@ -1,11 +1,13 @@
 package pl.notatki
 
-import android.R
+
 import android.content.Intent
 import android.os.Bundle
-import android.view.ContextThemeWrapper
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import pl.notatki.databinding.ActivityMainBinding
+import pl.notatki.databinding.ItemMainBinding
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,8 +22,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        val buttonNoteActivity = binding.addNote
-        buttonNoteActivity.setOnClickListener {
+        val buttonAddNote = binding.addNote
+        buttonAddNote.setOnClickListener {
             val notePage = Intent(this, NoteActivity::class.java)
             startActivity(notePage)
         }
@@ -29,8 +31,15 @@ class MainActivity : AppCompatActivity() {
         //Button dodawania notatki
         //val buttonAddNote = findViewById<Button>(R.id.add_note_button) as Button
 
-        //Styl dla notatki
-        val notatkaStyle = ContextThemeWrapper(baseContext, R.style.Theme)
+       var textView: TextView
+       textView = findViewById(R.id.noteTitle)
+        textView.text = "Tytuł"
+
+        var textView2: TextView
+        textView2 = findViewById(R.id.noteContent)
+        textView2.text = "Treść notatki"
+
+
 
 //        buttonAddNote.setOnClickListener{
 //            val note_card = CardView(notatkaStyle)

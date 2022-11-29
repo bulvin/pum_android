@@ -6,22 +6,18 @@ import java.time.LocalDate
 import java.time.LocalDate.now
 
 
-
 private val dateFormat = SimpleDateFormat("MMMM dd, yyyy")
 private val timeFormat = SimpleDateFormat("HH:mm")
 
 data class Note(val id: Int,
-                val title: String,
-                val content: String,
-                val label: Label,
-                val image: String,
-                val reminder: Reminder,
-                val updated_at: LocalDate = now()
+                var title: String,
+                var content: String,
+                var label: Label,
+                var image: String,
+                var reminder: Reminder,
+                var updated_at: LocalDate = now()
 ) {
 
-    fun getEditDate(){
-        dateFormat.format(updated_at)
-    }
 
 }
 
