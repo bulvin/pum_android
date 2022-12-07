@@ -1,4 +1,4 @@
-package pl.notatki
+package pl.notatki.activity
 
 import android.content.Intent
 import android.os.Bundle

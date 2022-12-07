@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme"
         tools:targetApi="33">
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NoteActivity"
+        <activity android:name=".activity.NoteActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LabelsActivity"
+        <activity android:name=".activity.LabelsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

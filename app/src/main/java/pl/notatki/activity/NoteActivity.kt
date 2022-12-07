@@ -1,15 +1,8 @@
-package pl.notatki
+package pl.notatki.activity
 
-import android.R
 import android.content.Intent
 import android.os.Bundle
-import android.view.ContextThemeWrapper
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import pl.notatki.databinding.ActivityMainBinding
 import pl.notatki.databinding.ActivityNoteBinding
 
 
