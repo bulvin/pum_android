@@ -33,10 +33,10 @@ class MainActivity : AppCompatActivity() {
 
 
         }
-        val note1 = Note(1,"Tytuł","Treść notatki",null,"",null)
+        val note1 = Note(1,"Tytuł","Treść notatki",null,null,null)
         note1.title = "Tytuł"
         note1.content = "treść"
-        val note2 = Note(2,"Tytuł","Treść notatki",null,"",null)
+        val note2 = Note(2,"Tytuł","Treść notatki",null,null,null)
         val arrList = arrayListOf<Note>()
 
 

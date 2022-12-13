@@ -13,22 +13,22 @@ import java.time.LocalDate.now
 private val dateFormat = SimpleDateFormat("MMMM dd, yyyy")
 private val timeFormat = SimpleDateFormat("HH:mm")
 
-
 @Entity
 data class Note(
     @PrimaryKey
     val noteId: Int,
     var title: String,
     var content: String,
-    var label: Label?,
     var image: String?,
+    @Relation(
+        parentColumn = "labelId",
+        entityColumn = "labels"
+    )
+    val labels: List<Label>?,
     @Embedded
     var reminder: Reminder?,
     var updated_at: LocalDate = now()
-) {
-
-
-}
+)
 
 @Entity
 data class Label(
@@ -37,21 +37,10 @@ data class Label(
                 val name: String,
                 val noteLabelId: Int?
 
-) {
-
-}
-
-data class NoteWithLabels(
-    @Embedded val note: Note,
-    @Relation(
-        parentColumn = "noteId",
-        entityColumn = "noteLabelId"
-    )
-    val notes: List<Label>?
 )
 
 
-data class Reminder(val id: Int,
+data class Reminder(
                     val date: String = "",
                     val timeReminder: String = "",
                     val location: String = ""
