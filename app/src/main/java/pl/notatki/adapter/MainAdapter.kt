@@ -36,8 +36,8 @@ class MainAdapter : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 class MainViewHolder(private val binding: ItemMainBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bindTo(note: Note){
-            binding.noteTitle.text = "Tytuł"
-            binding.noteContent.text = "Treść notatki"
+            binding.noteTitle.text = note.title
+            binding.noteContent.text = note.content
             binding.noteLabel.text = "Etykieta"
             binding.noteReminder.text = "29 lis 2022, 18:00"
 
