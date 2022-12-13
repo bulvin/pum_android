@@ -44,12 +44,10 @@ class MainViewHolder(private val binding: ItemMainBinding) : RecyclerView.ViewHo
                 .into(binding.noteImg)
         }
 
-
-
 }
 private val DIFF_CALLBACK: DiffUtil.ItemCallback<Note> = object : DiffUtil.ItemCallback<Note>(){
     override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem.noteId == newItem.noteId
     }
 
     override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {

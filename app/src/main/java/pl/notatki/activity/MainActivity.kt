@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         note1.title = "Tytuł"
         note1.content = "treść"
         val note2 = Note(2,"Tytuł","Treść notatki",null,"",null)
-       var arrList = arrayListOf<Note>()
+        val arrList = arrayListOf<Note>()
 
 
 
@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
 
         //Button dodawania notatki
         //val buttonAddNote = findViewById<Button>(R.id.add_note_button) as Button
-
 
 
 
