@@ -38,125 +38,6 @@
         app:srcCompat="@drawable/ic_return_foreground"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/backgroundColor"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="0dp"
-                android:clickable="true"
-                android:layout_marginBottom="1dp"
-                app:cardBackgroundColor="@color/orange_800"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="10dp"
-                app:cardMaxElevation="3dp"
-                app:cardPreventCornerOverlap="true"
-                app:contentPadding="4dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/noteImg"
-                        android:layout_width="match_parent"
-                        android:layout_height="210dp"
-                        android:contentDescription="img"
-                        android:padding="0dp"
-                        android:scaleType="fitXY"
-                        tools:src="@drawable/img"
-                        tools:visibility="visible" />
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Tytuł" />
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputDesc"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Notatka tresc"
-                        android:textSize="14sp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/button_add_tags"
-                            android:layout_width="98dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="0"
-                            android:backgroundTint="#8058D5D3"
-                            android:paddingEnd="10dp"
-                            android:text="Etykiety+"
-                            android:textAllCaps="false"
-                            android:textSize="12sp"
-                            app:cornerRadius="20dp"
-                            app:layout_columnWeight="0" />
-
-                        <TextView
-                            android:id="@+id/text_note_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:background="@color/white"
-                            android:backgroundTint="#80FCFB99"
-                            android:padding="10dp"
-                            android:textSize="13sp"
-                            app:cornerRadius="20dp"
-                            app:layout_columnWeight="0"
-                            tools:text="EtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykieta" />
-                    </LinearLayout>
-
-
-                    <Button
-                        android:id="@+id/button_add_reminder"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="0dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#8058D5D3"
-                        android:text="Przypomnienie+"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:cornerRadius="20dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
-    </ScrollView>
-
     <!--    <LinearLayout
            android:id="@+id/notes_layout"
            android:layout_width="0dp"
@@ -334,6 +215,127 @@
 
        </LinearLayout>
          -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/backgroundColor"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="0dp"
+                android:layout_marginBottom="1dp"
+                android:clickable="true"
+                app:cardBackgroundColor="@color/orange_800"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="10dp"
+                app:cardMaxElevation="3dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true"
+                app:contentPadding="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/noteImg"
+                        android:layout_width="match_parent"
+                        android:layout_height="210dp"
+                        android:contentDescription="img"
+                        android:padding="0dp"
+                        android:scaleType="fitXY"
+                        tools:src="@drawable/img"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Tytuł" />
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Notatka tresc"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/button_add_tags"
+                            android:layout_width="98dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:backgroundTint="#8058D5D3"
+                            android:paddingEnd="10dp"
+                            android:text="Etykiety+"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp"
+                            app:layout_columnWeight="0" />
+
+                        <TextView
+                            android:id="@+id/text_note_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:background="@color/white"
+                            android:backgroundTint="#80FCFB99"
+                            android:padding="10dp"
+                            android:textSize="13sp"
+                            app:cornerRadius="20dp"
+                            app:layout_columnWeight="0"
+                            tools:text="EtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykieta" />
+                    </LinearLayout>
+
+
+                    <Button
+                        android:id="@+id/button_add_reminder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="0dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#8058D5D3"
+                        android:text="Przypomnienie+"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/linearLayout"

@@ -1,10 +1,8 @@
 package pl.notatki.model
 
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.annotation.Nullable
+import androidx.room.*
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDate.now
@@ -15,38 +13,51 @@ private val timeFormat = SimpleDateFormat("HH:mm")
 
 @Entity
 data class Note(
-    @PrimaryKey
-    val noteId: Int,
+    @PrimaryKey(autoGenerate = true)
+    var noteId: Int?,
     var title: String,
     var content: String,
     var image: String?,
-    @Relation(
-        parentColumn = "labelId",
-        entityColumn = "labels"
-    )
-    val labels: List<Label>?,
     @Embedded
     var reminder: Reminder?,
-    var updated_at: LocalDate = now()
-)
+    var updated_at: String?
+){
+
+}
 
 @Entity
 data class Label(
                 @PrimaryKey
-                val labelId: Int,
-                val name: String,
-                val noteLabelId: Int?
+                var labelId: Int,
+                var name: String,
 
 )
 
 
+@Entity(primaryKeys = ["noteId", "labelId"])
+data class NoteLabelCrossRef(
+    var noteId: Int,
+    var labelId: Int
+)
+
+data class NoteWithLabels(
+    @Embedded var note: Note,
+    @Relation(
+        parentColumn = "noteId",
+        entityColumn = "labelId",
+        associateBy = Junction(NoteLabelCrossRef::class)
+    )
+    var labels: List<Label>?
+)
+
+
 data class Reminder(
-                    val date: String = "",
-                    val timeReminder: String = "",
-                    val location: String = ""
+                    var date: String = "",
+                    var timeReminder: String = "",
+                    var location: String = ""
 
 ) {
-    fun getDate() = dateFormat.parse(date)?.time
-
-    fun getTime() = timeFormat.parse(timeReminder)?.time
+//  fun getDate() = dateFormat.parse(date)?.time
+//
+//   fun getTime() = timeFormat.parse(timeReminder)?.time
 }

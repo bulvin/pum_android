@@ -1,13 +1,11 @@
 package pl.notatki.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import pl.notatki.R
 import pl.notatki.databinding.ItemMainBinding
@@ -27,7 +25,13 @@ class MainAdapter : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
     }
 
+    fun setNotes(list: List<Note>){
+        super.submitList(list)
+    }
+
 }
+
+
 
 class MainViewHolder(private val binding: ItemMainBinding) : RecyclerView.ViewHolder(binding.root) {
 

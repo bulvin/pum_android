@@ -8,12 +8,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityMainBinding
 import pl.notatki.model.Note
+import pl.notatki.model.NoteWithLabels
+import pl.notatki.repository.NoteRepository
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val adapter = MainAdapter()
+    private val repository by lazy { NoteRepository(applicationContext) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,25 +45,23 @@ class MainActivity : AppCompatActivity() {
 
 
 
-      arrList.add(note1)
+        arrList.add(note1)
         arrList.add(note2)
-        adapter.submitList(arrList)
+        //adapter.submitList(arrList)
 
-        //Button dodawania notatki
-        //val buttonAddNote = findViewById<Button>(R.id.add_note_button) as Button
-
-
-
-
-//        buttonAddNote.setOnClickListener{
-//            val note_card = CardView(notatkaStyle)
-//            val note_title = TextView(this)
-//            note_title.text = "Title"
-//            val notes_layout = findViewById<LinearLayout>(R.id.notes_layout)
-//            notes_layout.addView(note_card)
-//
-//            note_card.addView(note_title)
+        loadNotes()
         }
+
+    private fun loadNotes() {
+
+        repository.getNotes { noteList: List<Note> ->
+            runOnUiThread {
+                adapter.submitList(noteList)
+
+            }
+        }
+    }
+
 
 }
 
