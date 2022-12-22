@@ -14,7 +14,7 @@ class NoteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
-
+    private var edit: Boolean = false
 
     companion object {
         private const val EXTRAS_NOTE = "EXTRAS_NOTE"
@@ -35,31 +35,37 @@ class NoteActivity : AppCompatActivity() {
 
         val buttonNoteActivity = binding.returnButton
         buttonNoteActivity.setOnClickListener {
-            val notePage = Intent(this, MainActivity::class.java)
+            val main = Intent(this, MainActivity::class.java)
             val message: String
-            if(addNote()){
+            if(addNote() && !edit){
                  message = "Notatka została zapisana"
-                 startActivity(notePage)
             }else{
                   message =  "Notatka nie została zapisana"
-
             }
-            notePage.putExtra("info", message)
-            startActivity(notePage)
+            main.putExtra("info", message)
+            startActivity(main)
 
         }
 
 
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             showData(note)
+            edit = true
             binding.deleteButton.setOnClickListener{ deleteNote(note)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
             }
+            binding.returnButton.setOnClickListener{
+                note.title = binding.inputTitle.text.toString()
+                note.content = binding.inputDesc.text.toString()
+                updateNote(note)
+                val main = Intent(this, MainActivity::class.java)
+                startActivity(main)
+            }
 
         }
 
-
+        binding.noteImg.visibility = View.GONE
 
 
     }
@@ -90,6 +96,10 @@ class NoteActivity : AppCompatActivity() {
         runOnUiThread { repository.delete(note) }
     }
 
+    private fun updateNote(note: Note){
+        runOnUiThread { repository.update(note) }
+    }
+
     private fun showData(note: Note){
 
        if (note.image.isNullOrEmpty()){
@@ -99,6 +109,9 @@ class NoteActivity : AppCompatActivity() {
        }
         binding.inputTitle.setText(note.title)
         binding.inputDesc.setText(note.content)
+
+
+
 
     }
 
