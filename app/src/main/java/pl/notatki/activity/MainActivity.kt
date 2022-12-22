@@ -1,6 +1,7 @@
 package pl.notatki.activity
 
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -17,8 +18,11 @@ import pl.notatki.repository.NoteRepository
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val adapter = MainAdapter()
+    private val adapter = MainAdapter {
+        note -> NoteActivity.start(this, note)
+    }
     private val repository by lazy { NoteRepository(applicationContext) }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,5 +1,6 @@
 package pl.notatki.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -13,6 +14,17 @@ class NoteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
+
+
+    companion object {
+        private const val EXTRAS_NOTE = "EXTRAS_NOTE"
+
+        fun start(activity: Activity, note: Note) {
+            val intent = Intent(activity, NoteActivity::class.java)
+            intent.putExtra(EXTRAS_NOTE, note)
+            activity.startActivity(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +49,16 @@ class NoteActivity : AppCompatActivity() {
 
         }
 
-//        binding.deleteButton.setOnClickListener{ deleteNote() }
 
-        binding.noteImg.visibility = View.GONE
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            showData(note)
+            binding.deleteButton.setOnClickListener{ deleteNote(note)
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
+
+        }
+
 
 
 
@@ -67,7 +86,21 @@ class NoteActivity : AppCompatActivity() {
         return true
     }
     private fun deleteNote(note: Note) {
-        repository.delete(note)
+
+        runOnUiThread { repository.delete(note) }
     }
+
+    private fun showData(note: Note){
+
+       if (note.image.isNullOrEmpty()){
+           binding.noteImg.visibility = View.GONE
+       }else{
+           binding.noteImg.visibility = View.VISIBLE
+       }
+        binding.inputTitle.setText(note.title)
+        binding.inputDesc.setText(note.content)
+
+    }
+
 }
 
