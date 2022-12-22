@@ -5,5 +5,5 @@
     <item name="colorPrimaryDark">@color/blue_700</item>
     <item name="backgroundColor">@color/backgroundColor</item>
     <item name="colorSecondary">@color/orange_800</item>
-</style>
+    </style>
 </resources>
