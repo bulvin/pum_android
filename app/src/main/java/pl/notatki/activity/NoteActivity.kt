@@ -23,27 +23,51 @@ class NoteActivity : AppCompatActivity() {
 
         val buttonNoteActivity = binding.returnButton
         buttonNoteActivity.setOnClickListener {
-            addNote()
             val notePage = Intent(this, MainActivity::class.java)
+            val message: String
+            if(addNote()){
+                 message = "Notatka została zapisana"
+                 startActivity(notePage)
+            }else{
+                  message =  "Notatka nie została zapisana"
+
+            }
+            notePage.putExtra("info", message)
             startActivity(notePage)
 
         }
 
+//        binding.deleteButton.setOnClickListener{ deleteNote() }
+
         binding.noteImg.visibility = View.GONE
+
 
 
     }
 
-    private fun addNote(){
+    private fun addNote() : Boolean{
         val title = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
         val img = binding.noteImg.context.toString()
         val label = null
         val notification = null
 
-        val note = Note( null,title,desc, " ",notification,"13 gru, 2022 21:00")
-        runOnUiThread { repository.insertNoteToDabase(note) }
+        if (validateNote(title, desc)){
+            val note = Note( null,title,desc, " ",notification,"13 gru, 2022 21:00")
+            runOnUiThread { repository.insertNoteToDabase(note) }
+            return true
+        }
+       return false
+    }
 
-
+    private fun validateNote(title: String, desc: String): Boolean {
+        if (title.isEmpty() || title == " " && desc.isEmpty() || desc == "" ){
+            return false
+        }
+        return true
+    }
+    private fun deleteNote(note: Note) {
+        repository.delete(note)
     }
 }
+

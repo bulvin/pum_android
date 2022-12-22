@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import pl.notatki.R
 import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityMainBinding
 import pl.notatki.model.Note
@@ -54,12 +56,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadNotes() {
 
+        val value = intent.getStringExtra("info")
         repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
-                adapter.submitList(noteList)
+                adapter.setNotes(noteList)
 
             }
         }
+        if (value == "Notatka została zapisana" || value == "Notatka nie została zapisana"){
+            Snackbar.make(binding.root,
+                value, Snackbar.LENGTH_INDEFINITE).run {
+                setActionTextColor(resources.getColor(R.color.black))
+                setAction("OK") {
+
+                    dismiss()
+                }
+            }.show()
+        }
+
     }
 
 

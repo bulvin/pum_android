@@ -24,5 +24,8 @@ class NoteRepository(context: Context) {
             callback(database.noteDao().getNotes())
         }
     }
+    fun delete(note: Note){
+        executor.execute { database.noteDao().delete(note) }
+    }
 
 }
