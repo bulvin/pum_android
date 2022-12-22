@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         val buttonAddNote = binding.addNote
         buttonAddNote.setOnClickListener {
-            val notePage = Intent(this, NoteActivity::class.java)
+            val notePage = Intent(this, LabelsActivity::class.java)
             startActivity(notePage)
         }
 

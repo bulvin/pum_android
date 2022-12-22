@@ -31,9 +31,7 @@ class LabelAdapter : ListAdapter<Label, LabelViewHolder>(DIFF_CALLBACK) {
 class LabelViewHolder(private val binding: ItemLabelBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bindTo(label: Label){
-            binding.editLabel
-            binding.deleteLabelButton
-            binding.checkBox
+            binding.editLabel.setText(label.name)
         }
 }
 

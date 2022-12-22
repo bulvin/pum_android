@@ -52,7 +52,7 @@ class LabelsActivity : AppCompatActivity() {
     }
 
     private fun addLabel(){
-        val title = "test"
+        val title = "s"
 
         val label = Label( null,title)
         runOnUiThread { repository.insertLabelToDabase(label) }
