@@ -30,8 +30,6 @@ class NoteActivity : AppCompatActivity() {
         }
 
         binding.noteImg.visibility = View.GONE
-
-
     }
 
     private fun addNote(){

@@ -28,7 +28,7 @@ data class Note(
 @Entity
 data class Label(
                 @PrimaryKey
-                var labelId: Int,
+                var labelId: Int?,
                 var name: String,
 
 )

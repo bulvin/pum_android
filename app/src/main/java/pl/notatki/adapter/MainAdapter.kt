@@ -25,6 +25,8 @@ class MainAdapter : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
     }
 
+
+
     fun setNotes(list: List<Note>){
         super.submitList(list)
     }
@@ -40,7 +42,6 @@ class MainViewHolder(private val binding: ItemMainBinding) : RecyclerView.ViewHo
             binding.noteContent.text = note.content
             binding.noteLabel.text = "Etykieta"
             binding.noteReminder.text = "29 lis 2022, 18:00"
-
 
             Glide.with(itemView)
                 .load(R.drawable.img)
