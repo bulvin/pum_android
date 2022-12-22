@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import pl.notatki.model.Label
 import pl.notatki.model.Note
 import pl.notatki.model.NoteWithLabels
 
@@ -28,4 +29,16 @@ interface NoteDAO {
 
     @Update
     fun update(note: Note)
+
+    @Query("SELECT * FROM Label")
+    fun getLabels(): List<Label>
+
+    @Insert
+    fun insertLabel(label: Label)
+
+    @Delete
+    fun deleteLabel(label: Label)
+
+    @Update
+    fun updateLabel(label: Label)
 }

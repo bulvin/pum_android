@@ -32,10 +32,12 @@ data class Note(
 @Parcelize
 data class Label(
                 @PrimaryKey
-                var labelId: Int,
+                var labelId: Int?,
                 var name: String,
 
-) : Parcelable
+) : Parcelable{
+
+}
 
 
 @Entity(primaryKeys = ["noteId", "labelId"])

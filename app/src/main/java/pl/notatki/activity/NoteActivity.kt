@@ -44,6 +44,7 @@ class NoteActivity : AppCompatActivity() {
             }
             main.putExtra("info", message)
             startActivity(main)
+            finish()
 
         }
 
@@ -61,13 +62,12 @@ class NoteActivity : AppCompatActivity() {
                 updateNote(note)
                 val main = Intent(this, MainActivity::class.java)
                 startActivity(main)
+                finish()
             }
 
         }
 
         binding.noteImg.visibility = View.GONE
-
-
     }
 
     private fun addNote() : Boolean{
