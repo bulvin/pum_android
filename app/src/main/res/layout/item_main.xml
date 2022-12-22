@@ -40,7 +40,6 @@
                 android:contentDescription="img"
                 android:padding="0dp"
                 android:scaleType="fitXY"
-                app:shapeAppearanceOverlay="@style/CornerCut"
                 tools:src="@drawable/img" />
 
             <TextView

@@ -311,7 +311,8 @@
                             android:textSize="13sp"
                             app:cornerRadius="20dp"
                             app:layout_columnWeight="0"
-                            tools:text="EtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykietaEtykieta" />
+                            tools:cornerRadius="20dp"
+                            tools:text="Etykieta" />
                     </LinearLayout>
 
 
