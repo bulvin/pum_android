@@ -109,10 +109,6 @@ class NoteActivity : AppCompatActivity() {
        }
         binding.inputTitle.setText(note.title)
         binding.inputDesc.setText(note.content)
-
-
-
-
     }
 
 }

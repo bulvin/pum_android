@@ -1,8 +1,11 @@
 package pl.notatki.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import pl.notatki.adapter.LabelAdapter
 import pl.notatki.adapter.MainAdapter
@@ -15,7 +18,46 @@ import pl.notatki.repository.NoteRepository
 class LabelsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLabelsBinding
-    private val adapter = LabelAdapter()
+    private var edit: Boolean = false
+    private val adapter = LabelAdapter {
+
+            label: Label -> label
+            loadlabels()
+
+            val menuAdd = binding.menuBottomAdd
+            menuAdd.visibility = View.GONE
+
+            val menuEdit = binding.menuBottomEdit
+            menuEdit.visibility = View.VISIBLE
+
+            binding.textInputEditLabel.hint = label.name
+
+            binding.deleteLabelButton2.setOnClickListener{ deleteLabel(label)
+                loadlabels()
+
+                val menuEdit = binding.menuBottomEdit
+                menuEdit.visibility = View.GONE
+
+                val menuAdd = binding.menuBottomAdd
+                menuAdd.visibility = View.VISIBLE
+            }
+
+            binding.confirmLabelButton2.setOnClickListener{
+                label.name = binding.inputEditLabel.text.toString()
+                updateLabel(label)
+                val main = Intent(this, MainActivity::class.java)
+
+                loadlabels()
+
+                val menuEdit = binding.menuBottomEdit
+                menuEdit.visibility = View.GONE
+
+                val menuAdd = binding.menuBottomAdd
+                menuAdd.visibility = View.VISIBLE
+
+            }
+    }
+
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +76,16 @@ class LabelsActivity : AppCompatActivity() {
             startActivity(notePage)
         }
 
+        val buttonConfirmLabel = binding.confirmLabelButton2
+        buttonConfirmLabel.setOnClickListener() {
+            loadlabels()
+
+            val menuEdit = binding.menuBottomEdit
+            menuEdit.visibility = View.GONE
+
+            val menuAdd = binding.menuBottomAdd
+            menuAdd.visibility = View.VISIBLE
+        }
 
         val buttonAddLabel = binding.addLabelButton
         buttonAddLabel.setOnClickListener {
@@ -41,21 +93,27 @@ class LabelsActivity : AppCompatActivity() {
             loadlabels()
         }
 
-        val label1 = Label(111,"Tytuł")
-        label1.name = "Tytuł"
-        val arrList = arrayListOf<Label>()
-
-        arrList.add(label1)
-        //adapter.submitList(arrList)
-
         loadlabels()
     }
 
-    private fun addLabel(){
-        val title = "s"
+    private fun showData(label: Label){
+        binding.inputEditLabel.setText(label.name)
+    }
 
-        val label = Label( null,title)
-        runOnUiThread { repository.insertLabelToDabase(label) }
+    private fun addLabel(): Boolean{
+        var name = binding.inputLabel.text.toString()
+
+        if(binding.inputLabel.text.toString() == "")
+        {
+            name = ""
+        }
+
+        if (validateLabel(name)) {
+            val label = Label(null, name)
+            runOnUiThread { repository.insertLabelToDabase(label)}
+            return true
+        }
+        return false
     }
 
     private fun loadlabels() {
@@ -66,5 +124,20 @@ class LabelsActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    private fun deleteLabel(label: Label) {
+        runOnUiThread { repository.deleteLabel(label) }
+    }
+
+    private fun updateLabel(label: Label){
+        runOnUiThread { repository.updateLabel(label) }
+    }
+
+    private fun validateLabel(name: String): Boolean {
+        if (name.isEmpty() || name == " "){
+            return false
+        }
+        return true
     }
 }

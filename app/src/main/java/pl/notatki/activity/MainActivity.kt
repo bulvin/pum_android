@@ -37,9 +37,18 @@ class MainActivity : AppCompatActivity() {
 
         val buttonAddNote = binding.addNote
         buttonAddNote.setOnClickListener {
-            val notePage = Intent(this, LabelsActivity::class.java)
+            val notePage = Intent(this, NoteActivity::class.java)
             startActivity(notePage)
         }
+
+        //MenuClickListener
+        binding.materialToolbar.setOnMenuItemClickListener {
+            when(it.itemId) {
+                R.id.labels -> startLabelsActivity()
+            }
+            true
+        }
+
 
 
         val note1 = Note(1,"Tytuł","Treść notatki",null,null,null)
@@ -75,6 +84,11 @@ class MainActivity : AppCompatActivity() {
             }.show()
         }
 
+    }
+
+    private fun startLabelsActivity(){
+        val notePage = Intent(this, LabelsActivity::class.java)
+        startActivity(notePage)
     }
 
 

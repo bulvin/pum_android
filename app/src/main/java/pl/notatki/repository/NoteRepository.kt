@@ -43,4 +43,11 @@ class NoteRepository(context: Context) {
         }
     }
 
+    fun deleteLabel(label: Label){
+        executor.execute { database.noteDao().deleteLabel(label) }
+    }
+
+    fun updateLabel(label: Label){
+        executor.execute { database.noteDao().updateLabel(label) }
+    }
 }
