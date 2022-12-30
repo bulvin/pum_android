@@ -4,13 +4,14 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
-import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
-import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,6 +22,12 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
     private var edit: Boolean = false
+    private var selectedImg = ""
+
+
+    private  val REQUEST_CODE_PICK_IMAGE = 1
+
+
 
     companion object {
         private const val EXTRAS_NOTE = "EXTRAS_NOTE"
@@ -53,6 +60,7 @@ class NoteActivity : AppCompatActivity() {
             startActivity(main)
             finish()
         }
+
 
 
         val buttonAddLabel = binding.buttonAddTags
@@ -97,6 +105,7 @@ class NoteActivity : AppCompatActivity() {
             }
 
         }
+        binding.imageButon.setOnClickListener{ pickImg() }
 
 
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
@@ -109,7 +118,7 @@ class NoteActivity : AppCompatActivity() {
             binding.returnButton.setOnClickListener{
                 note.title = binding.inputTitle.text.toString()
                 note.content = binding.inputDesc.text.toString()
-
+                note.image = selectedImg
                 /*if(buttonReminder.visibility == View.VISIBLE){
 
                 }*/
@@ -124,6 +133,49 @@ class NoteActivity : AppCompatActivity() {
 
         binding.noteImg.visibility = View.GONE
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // sprawdzamy, czy wynik pochodzi od odpowiedniego intentu
+        if (requestCode == REQUEST_CODE_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
+            // pobieramy URI obrazka z intentu
+            val imageUri = data?.data
+            if (imageUri != null){
+                // wczytujemy obrazek do pamięci
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+
+                // wyświetlamy obrazek w imageView
+                binding.noteImg.setImageBitmap(bitmap)
+
+                binding.noteImg.visibility = View.VISIBLE
+
+                selectedImg = getPathImg(imageUri)!!
+            }
+
+
+        }
+    }
+
+    private fun getPathImg(contentUri: Uri) : String?{
+        var path: String? = null
+        val cursor: Cursor? = contentResolver.query(contentUri, null, null, null, null)
+        if (cursor == null){
+            path = contentUri.path
+        }
+        else {
+            cursor.moveToFirst()
+            val index = cursor.getColumnIndex("_data")
+            path = cursor.getString(index)
+            cursor.close()
+
+        }
+        return path
+
+
+    }
+
+
+
 
     private fun formatterReminder(calendar: Calendar) {
         val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy", Locale.UK)
@@ -164,14 +216,23 @@ class NoteActivity : AppCompatActivity() {
 
     private fun showData(note: Note){
 
-       if (note.image.isNullOrEmpty()){
-           binding.noteImg.visibility = View.GONE
-       }else{
-           binding.noteImg.visibility = View.VISIBLE
-       }
+        if (note.image != ""){
+            binding.noteImg.visibility = View.VISIBLE
+        }
+        else{
+            binding.noteImg.visibility = View.GONE
+        }
         binding.inputTitle.setText(note.title)
         binding.inputDesc.setText(note.content)
     }
+
+    private fun pickImg(){
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(galleryIntent, REQUEST_CODE_PICK_IMAGE)
+
+    }
+
+
 
 }
 
