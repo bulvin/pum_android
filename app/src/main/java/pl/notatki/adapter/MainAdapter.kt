@@ -46,7 +46,7 @@ class MainViewHolder(private val binding: ItemMainBinding, private val onItemCli
             binding.noteReminder.text = "29 lis 2022, 18:00"
 
             Glide.with(itemView)
-                .load(R.drawable.img)
+                .load(note.image)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.noteImg)
         }
