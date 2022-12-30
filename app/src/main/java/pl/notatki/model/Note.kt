@@ -59,7 +59,6 @@ data class NoteWithLabels(
     var labels: List<Label>?
 ) : Parcelable
 
-
 @Parcelize
 data class Reminder(
                     var date: String = "",

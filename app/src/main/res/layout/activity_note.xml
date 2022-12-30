@@ -309,6 +309,7 @@
                             android:backgroundTint="#80FCFB99"
                             android:padding="10dp"
                             android:textSize="13sp"
+                            android:visibility="gone"
                             app:cornerRadius="20dp"
                             app:layout_columnWeight="0"
                             tools:cornerRadius="20dp"
@@ -316,19 +317,43 @@
                     </LinearLayout>
 
 
-                    <Button
-                        android:id="@+id/button_add_reminder"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="0dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#8058D5D3"
-                        android:text="Przypomnienie+"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:cornerRadius="20dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/button_add_reminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="0dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#8058D5D3"
+                            android:text="Przypomnienie+"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                            android:id="@+id/button_reminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#80FCFB99"
+                            android:text=" "
+
+                            android:textAllCaps="false"
+                            android:textColor="#000000"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            app:cornerRadius="20dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

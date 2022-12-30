@@ -9,6 +9,7 @@ import androidx.room.Update
 import pl.notatki.model.Label
 import pl.notatki.model.Note
 import pl.notatki.model.NoteWithLabels
+import pl.notatki.model.Reminder
 
 @Dao
 interface NoteDAO {
@@ -41,4 +42,5 @@ interface NoteDAO {
 
     @Update
     fun updateLabel(label: Label)
+
 }

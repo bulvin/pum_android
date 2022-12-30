@@ -10,14 +10,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import pl.notatki.adapter.LabelAdapter
 import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityLabelsBinding
+import pl.notatki.databinding.ActivityNoteLabelsBinding
 import pl.notatki.model.Label
 import pl.notatki.model.Note
 import pl.notatki.repository.NoteRepository
 
 
-class LabelsActivity : AppCompatActivity() {
+class NoteLabelsActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLabelsBinding
+    private lateinit var binding: ActivityNoteLabelsBinding
     private var edit: Boolean = false
     private val adapter = LabelAdapter {
 
@@ -63,7 +64,7 @@ class LabelsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityLabelsBinding.inflate(layoutInflater)
+        binding = ActivityNoteLabelsBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
 
@@ -72,8 +73,8 @@ class LabelsActivity : AppCompatActivity() {
 
         val buttonNoteActivity = binding.returnButton
         buttonNoteActivity.setOnClickListener {
-            val main = Intent(this, MainActivity::class.java)
-            startActivity(main)
+            val notePage = Intent(this, NoteActivity::class.java)
+            startActivity(notePage)
             finish()
         }
 

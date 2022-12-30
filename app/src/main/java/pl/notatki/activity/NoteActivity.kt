@@ -1,13 +1,19 @@
 package pl.notatki.activity
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
+import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class NoteActivity : AppCompatActivity() {
@@ -25,6 +31,7 @@ class NoteActivity : AppCompatActivity() {
             activity.startActivity(intent)
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +52,49 @@ class NoteActivity : AppCompatActivity() {
             main.putExtra("info", message)
             startActivity(main)
             finish()
+        }
+
+
+        val buttonAddLabel = binding.buttonAddTags
+        buttonAddLabel.setOnClickListener  {
+            val noteLabels = Intent(this, NoteLabelsActivity::class.java)
+            startActivity(noteLabels)
+        }
+
+        val calendar = Calendar.getInstance()
+
+        val timePicker = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+            calendar.set(Calendar.MINUTE, minute)
+            formatterReminder(calendar)
+        }
+
+        val datePicker = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.YEAR, year)
+            formatterReminder(calendar)
+        }
+
+        val buttonReminder = binding.buttonReminder
+
+        buttonReminder.setOnClickListener {
+            DatePickerDialog(this, datePicker, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.YEAR)).show()
+            TimePickerDialog(this, timePicker, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
+                true).show()
+        }
+
+        val buttonAddReminder = binding.buttonAddReminder
+        buttonAddReminder.setOnClickListener  {
+            if(buttonReminder.visibility == View.GONE){
+                buttonReminder.visibility = View.VISIBLE
+                buttonAddReminder.text = "Przypomnienie-"
+
+            } else {
+                buttonReminder.visibility = View.GONE
+                buttonAddReminder.text = "Przypomnienie+"
+            }
 
         }
 
@@ -59,6 +109,11 @@ class NoteActivity : AppCompatActivity() {
             binding.returnButton.setOnClickListener{
                 note.title = binding.inputTitle.text.toString()
                 note.content = binding.inputDesc.text.toString()
+
+                /*if(buttonReminder.visibility == View.VISIBLE){
+
+                }*/
+
                 updateNote(note)
                 val main = Intent(this, MainActivity::class.java)
                 startActivity(main)
@@ -68,6 +123,13 @@ class NoteActivity : AppCompatActivity() {
         }
 
         binding.noteImg.visibility = View.GONE
+    }
+
+    private fun formatterReminder(calendar: Calendar) {
+        val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy", Locale.UK)
+        //val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
+        val buttonReminder = binding.buttonReminder
+        buttonReminder.text = formatter.format(calendar.time)
     }
 
     private fun addNote() : Boolean{

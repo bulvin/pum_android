@@ -5,6 +5,7 @@ import pl.notatki.database.DatabaseProvider
 import pl.notatki.model.Label
 import pl.notatki.model.Note
 import pl.notatki.model.NoteWithLabels
+import pl.notatki.model.Reminder
 import java.util.concurrent.Executors
 
 class NoteRepository(context: Context) {
