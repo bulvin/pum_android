@@ -1,8 +1,8 @@
 package pl.notatki.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +11,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import pl.notatki.R
 import pl.notatki.databinding.ItemMainBinding
 import pl.notatki.model.Note
+import pl.notatki.model.Reminder
 
 class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
@@ -26,24 +27,31 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
     }
 
-
-
     fun setNotes(list: List<Note>){
         super.submitList(list)
     }
 
 }
 
-
-
 class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(binding.root) {
 
+
+
         fun bindTo(note: Note){
+            val reminder = note.reminder
+            val timeReminder = reminder?.timeReminder.toString() + "  "
+            val dateReminder = reminder?.date.toString() + "  "
+            val locationReminder = reminder?.location.toString() + "  "
+
             binding.cardView.setOnClickListener { onItemClickListener(note) }
             binding.noteTitle.text = note.title
             binding.noteContent.text = note.content
             binding.noteLabel.text = "Etykieta"
-            binding.noteReminder.text = "29 lis 2022, 18:00"
+            if(reminder!=null) {
+                binding.noteReminder.text = timeReminder + dateReminder + locationReminder
+            } else {
+                binding.noteReminder.visibility = View.GONE
+            }
 
             Glide.with(itemView)
                 .load(R.drawable.img)

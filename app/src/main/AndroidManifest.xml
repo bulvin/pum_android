@@ -29,7 +29,10 @@
 
         <activity android:name=".activity.NoteActivity"/>
         <activity android:name=".activity.LabelsActivity"/>
-        <activity android:name=".activity.NoteLabelsActivity"/>
+
+        <activity android:name=".activity.NoteLabelsActivity"
+            android:theme="@style/AppTheme">
+        </activity>
 
 
 

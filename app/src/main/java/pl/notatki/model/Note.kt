@@ -23,7 +23,8 @@ data class Note(
     var image: String?,
     @Embedded
     var reminder: Reminder?,
-    var updated_at: String?
+    var updated_at: String?,
+
 ) : Parcelable{
 
 }

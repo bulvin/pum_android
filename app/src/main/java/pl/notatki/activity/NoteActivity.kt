@@ -3,6 +3,7 @@ package pl.notatki.activity
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
@@ -12,6 +13,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
+import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,13 +26,10 @@ class NoteActivity : AppCompatActivity() {
     private var edit: Boolean = false
     private var selectedImg = ""
 
-
     private  val REQUEST_CODE_PICK_IMAGE = 1
 
-
-
     companion object {
-        private const val EXTRAS_NOTE = "EXTRAS_NOTE"
+        const val EXTRAS_NOTE = "EXTRAS_NOTE"
 
         fun start(activity: Activity, note: Note) {
             val intent = Intent(activity, NoteActivity::class.java)
@@ -39,13 +38,16 @@ class NoteActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityNoteBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+
+
+
+
 
         val buttonNoteActivity = binding.returnButton
         buttonNoteActivity.setOnClickListener {
@@ -61,40 +63,55 @@ class NoteActivity : AppCompatActivity() {
             finish()
         }
 
-
-
+        //Labels
         val buttonAddLabel = binding.buttonAddTags
         buttonAddLabel.setOnClickListener  {
-            val noteLabels = Intent(this, NoteLabelsActivity::class.java)
-            startActivity(noteLabels)
+
         }
+
+        //Remindeers
+        val buttonReminder = binding.buttonReminder
+
+        //Sprawdza czy przypomnienie nie jest puste i na podstawie tego wyświetla je, albo nie
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            val reminder = note.reminder
+            if (reminder != null) {
+                if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
+                    buttonReminder.visibility = View.VISIBLE
+                    buttonReminder.text = reminder.timeReminder + reminder.date + reminder.location
+                }
+            }
+        }
+
+        val buttonAddReminder = binding.buttonAddReminder
+        val reminder = Reminder("","","")
 
         val calendar = Calendar.getInstance()
 
+        //Wybieranie czasu
         val timePicker = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
             calendar.set(Calendar.MINUTE, minute)
             formatterReminder(calendar)
+
+            val formatterTime = SimpleDateFormat("hh:mm", Locale.UK)
+            reminder.timeReminder = formatterTime.format(calendar.time)
         }
 
+        //Wybieranie daty
         val datePicker = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.YEAR, year)
             formatterReminder(calendar)
+
+            val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.UK)
+            reminder.date = formatterDate.format(calendar.time)
         }
 
-        val buttonReminder = binding.buttonReminder
-
-        buttonReminder.setOnClickListener {
-            DatePickerDialog(this, datePicker, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.YEAR)).show()
-            TimePickerDialog(this, timePicker, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
-                true).show()
-        }
-
-        val buttonAddReminder = binding.buttonAddReminder
+        //Dodaje przycisk Reminder
         buttonAddReminder.setOnClickListener  {
+
             if(buttonReminder.visibility == View.GONE){
                 buttonReminder.visibility = View.VISIBLE
                 buttonAddReminder.text = "Przypomnienie-"
@@ -103,8 +120,18 @@ class NoteActivity : AppCompatActivity() {
                 buttonReminder.visibility = View.GONE
                 buttonAddReminder.text = "Przypomnienie+"
             }
-
         }
+
+        //Otwiera date i time pickery
+        buttonReminder.setOnClickListener {
+            DatePickerDialog(this, datePicker, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.YEAR)).show()
+
+            TimePickerDialog(this, timePicker, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
+                true).show()
+        }
+
+
         binding.imageButon.setOnClickListener{ pickImg() }
 
 
@@ -119,16 +146,19 @@ class NoteActivity : AppCompatActivity() {
                 note.title = binding.inputTitle.text.toString()
                 note.content = binding.inputDesc.text.toString()
                 note.image = selectedImg
-                /*if(buttonReminder.visibility == View.VISIBLE){
+                if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ){
+                    note.reminder = reminder
+                } else {
+                    note.reminder = null
+                }
 
-                }*/
+
 
                 updateNote(note)
                 val main = Intent(this, MainActivity::class.java)
                 startActivity(main)
                 finish()
             }
-
         }
 
         binding.noteImg.visibility = View.GONE
@@ -151,7 +181,6 @@ class NoteActivity : AppCompatActivity() {
 
                 selectedImg = getPathImg(imageUri)!!
             }
-
 
         }
     }
@@ -178,7 +207,7 @@ class NoteActivity : AppCompatActivity() {
 
 
     private fun formatterReminder(calendar: Calendar) {
-        val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy", Locale.UK)
+        val formatter = SimpleDateFormat("hh:mm dd.MM.yyyy", Locale.UK)
         //val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
         val buttonReminder = binding.buttonReminder
         buttonReminder.text = formatter.format(calendar.time)
@@ -190,6 +219,8 @@ class NoteActivity : AppCompatActivity() {
         val img = binding.noteImg.context.toString()
         val label = null
         val notification = null
+
+
 
         if (validateNote(title, desc)){
             val note = Note( null,title,desc, " ",notification,"13 gru, 2022 21:00")
@@ -231,8 +262,5 @@ class NoteActivity : AppCompatActivity() {
         startActivityForResult(galleryIntent, REQUEST_CODE_PICK_IMAGE)
 
     }
-
-
-
 }
 

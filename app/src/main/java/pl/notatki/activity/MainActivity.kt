@@ -1,7 +1,6 @@
 package pl.notatki.activity
 
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -11,7 +10,6 @@ import pl.notatki.R
 import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityMainBinding
 import pl.notatki.model.Note
-import pl.notatki.model.NoteWithLabels
 import pl.notatki.repository.NoteRepository
 
 
@@ -48,8 +46,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-
 
         val note1 = Note(1,"Tytuł","Treść notatki",null,null,null)
         note1.title = "Tytuł"
