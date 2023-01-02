@@ -11,7 +11,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import pl.notatki.R
 import pl.notatki.databinding.ItemMainBinding
 import pl.notatki.model.Note
-import pl.notatki.model.Reminder
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
@@ -31,6 +33,42 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
         super.submitList(list)
     }
 
+    fun setNotesArchive(list: List<Note>){
+        val listArchive : MutableList <Note> = mutableListOf()
+
+       /* for (note in list) {
+            val reminder = note.reminder
+            val reminderTime = reminder?.timeReminder + " " + reminder?.date
+            val pattern = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
+            val localDateTime = Date(reminderTime)
+
+            val currentTime: Date = Calendar.getInstance().getTime()
+
+            if(localDateTime>currentTime){
+                listArchive.add(note)
+            }
+        }*/
+
+        super.submitList(listArchive)
+    }
+
+    fun setNotesReminders(list: List<Note>){
+        val listReminders : MutableList <Note> = mutableListOf()
+
+        for (note in list) {
+            val reminder = note.reminder
+            val reminderTime = reminder?.timeReminder + " " + reminder?.date
+
+            if (reminder != null) {
+                if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ){
+                    listReminders.add(note)
+                }
+            }
+        }
+
+        super.submitList(listReminders)
+    }
+
 }
 
 class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(binding.root) {
@@ -47,8 +85,12 @@ class MainViewHolder(private val binding: ItemMainBinding, private val onItemCli
             binding.noteTitle.text = note.title
             binding.noteContent.text = note.content
             binding.noteLabel.text = "Etykieta"
-            if(reminder!=null) {
-                binding.noteReminder.text = timeReminder + dateReminder + locationReminder
+            if (reminder != null) {
+                if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
+                    binding.noteReminder.text = timeReminder + dateReminder + locationReminder
+                } else {
+                    binding.noteReminder.visibility = View.GONE
+                }
             } else {
                 binding.noteReminder.visibility = View.GONE
             }

@@ -1,16 +1,19 @@
 package pl.notatki.activity
 
-import android.app.Activity
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.content.DialogInterface
+import android.app.*
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import pl.notatki.R
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
 import pl.notatki.model.Reminder
@@ -21,10 +24,16 @@ import java.util.*
 
 class NoteActivity : AppCompatActivity() {
 
+    private lateinit var notificationManager : NotificationManager
+    private lateinit var notificationChannel : NotificationChannel
+    private lateinit var builder : Notification.Builder
+    private var channelID = "pl.notatki.activity"
+
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
     private var edit: Boolean = false
     private var selectedImg = ""
+    private val channelId = "notatki_przypomnienia" //Kanał dla przypomnień
 
     private  val REQUEST_CODE_PICK_IMAGE = 1
 
@@ -42,12 +51,9 @@ class NoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityNoteBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
-
-
-
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val buttonNoteActivity = binding.returnButton
         buttonNoteActivity.setOnClickListener {
@@ -67,6 +73,8 @@ class NoteActivity : AppCompatActivity() {
         val buttonAddLabel = binding.buttonAddTags
         buttonAddLabel.setOnClickListener  {
 
+            //Tylko do testowania notyfikacji na razie, bo jedyny wolny button, można usunąć
+            sendNotification()
         }
 
         //Remindeers
@@ -119,6 +127,7 @@ class NoteActivity : AppCompatActivity() {
             } else {
                 buttonReminder.visibility = View.GONE
                 buttonAddReminder.text = "Przypomnienie+"
+
             }
         }
 
@@ -163,6 +172,8 @@ class NoteActivity : AppCompatActivity() {
 
         binding.noteImg.visibility = View.GONE
     }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -199,12 +210,38 @@ class NoteActivity : AppCompatActivity() {
 
         }
         return path
-
-
     }
 
+    private fun sendNotification() {
+        val name = binding.inputTitle.toString()
+        val desc = binding.inputDesc.toString()
+        Log.d("Test", "Próba tworzenia notyfikacji")
 
+        val intent = Intent(this,NoteActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this,0,intent, PendingIntent.FLAG_IMMUTABLE)
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            notificationChannel = NotificationChannel(channelID,name, NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(notificationChannel)
+
+            Log.d("Test", "Próba tworzenia notyfikacji 2")
+
+            builder = Notification.Builder(this,channelID)
+                .setContentTitle(name)
+                .setContentText(desc)
+                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
+                .setContentIntent(pendingIntent)
+        } else {
+            builder = Notification.Builder(this)
+                .setContentTitle(name)
+                .setContentText(desc)
+                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
+                .setContentIntent(pendingIntent)
+        }
+
+        notificationManager.notify(101,builder.build())
+        Log.d("Test", notificationChannel.id.toString())
+    }
 
     private fun formatterReminder(calendar: Calendar) {
         val formatter = SimpleDateFormat("hh:mm dd.MM.yyyy", Locale.UK)

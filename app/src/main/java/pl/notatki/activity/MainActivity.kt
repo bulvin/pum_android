@@ -16,6 +16,7 @@ import pl.notatki.repository.NoteRepository
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
     private val adapter = MainAdapter {
         note -> NoteActivity.start(this, note)
     }
@@ -44,6 +45,27 @@ class MainActivity : AppCompatActivity() {
             when(it.itemId) {
                 R.id.labels -> startLabelsActivity()
             }
+
+            if(it.itemId == R.id.notes){
+                binding.materialToolbar.title = "Notatki Mobilne"
+                loadNotes()
+            }
+
+            if(it.itemId == R.id.notes){
+                binding.materialToolbar.title = "Notatki Mobilne"
+                loadNotes()
+            }
+
+            if(it.itemId == R.id.reminders){
+                binding.materialToolbar.title = "Przypomnienia"
+                loadReminderNotes()
+            }
+
+            if(it.itemId == R.id.archives){
+                binding.materialToolbar.title = "Archiwum"
+                loadArchiveNotes()
+            }
+
             true
         }
 
@@ -60,15 +82,14 @@ class MainActivity : AppCompatActivity() {
         loadNotes()
         }
 
-    private fun loadNotes() {
-
+    private fun loadReminderNotes(){
         val value = intent.getStringExtra("info")
         repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
-                adapter.setNotes(noteList)
-
+                adapter.setNotesReminders(noteList)
             }
         }
+
         if (value == "Notatka została zapisana" || value == "Notatka nie została zapisana"){
             Snackbar.make(binding.root,
                 value, Snackbar.LENGTH_INDEFINITE).run {
@@ -79,7 +100,47 @@ class MainActivity : AppCompatActivity() {
                 }
             }.show()
         }
+    }
 
+    private fun loadArchiveNotes(){
+        val value = intent.getStringExtra("info")
+        repository.getNotes { noteList: List<Note> ->
+            runOnUiThread {
+                adapter.setNotesArchive(noteList)
+            }
+        }
+
+        if (value == "Notatka została zapisana" || value == "Notatka nie została zapisana"){
+            Snackbar.make(binding.root,
+                value, Snackbar.LENGTH_INDEFINITE).run {
+                setActionTextColor(resources.getColor(R.color.black))
+                setAction("OK") {
+
+                    dismiss()
+                }
+            }.show()
+        }
+    }
+
+    private fun loadNotes() {
+
+        val value = intent.getStringExtra("info")
+        repository.getNotes { noteList: List<Note> ->
+            runOnUiThread {
+                adapter.setNotes(noteList)
+            }
+        }
+
+        if (value == "Notatka została zapisana" || value == "Notatka nie została zapisana"){
+            Snackbar.make(binding.root,
+                value, Snackbar.LENGTH_INDEFINITE).run {
+                setActionTextColor(resources.getColor(R.color.black))
+                setAction("OK") {
+
+                    dismiss()
+                }
+            }.show()
+        }
     }
 
     private fun startLabelsActivity(){
