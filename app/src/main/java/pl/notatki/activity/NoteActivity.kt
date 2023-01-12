@@ -11,8 +11,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import pl.notatki.R
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
@@ -69,6 +67,8 @@ class NoteActivity : AppCompatActivity() {
             finish()
         }
 
+
+
         //Labels
         val buttonAddLabel = binding.buttonAddTags
         buttonAddLabel.setOnClickListener  {
@@ -80,14 +80,20 @@ class NoteActivity : AppCompatActivity() {
         //Remindeers
         val buttonReminder = binding.buttonReminder
 
-        //Sprawdza czy przypomnienie nie jest puste i na podstawie tego wyświetla je, albo nie
+
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             val reminder = note.reminder
-            if (reminder != null) {
+            if (reminder != null) { //Sprawdza czy przypomnienie nie jest puste i na podstawie tego wyświetla je, albo nie
                 if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
                     buttonReminder.visibility = View.VISIBLE
                     buttonReminder.text = reminder.timeReminder + reminder.date + reminder.location
                 }
+            }
+
+            if(note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
+                binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
+            } else {
+                binding.archiveButton.setImageResource(R.drawable.ic_baseline_archive_24)
             }
         }
 
@@ -147,6 +153,19 @@ class NoteActivity : AppCompatActivity() {
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             showData(note)
             edit = true
+
+            binding.archiveButton.setOnClickListener {
+                if(note.archived == false){
+                    note.archived = true;
+                    binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
+                    updateNote(note)
+                } else {
+                    note.archived = false;
+                    binding.archiveButton.setImageResource(R.drawable.ic_baseline_archive_24)
+                    updateNote(note)
+                }
+            }
+
             binding.deleteButton.setOnClickListener{ deleteNote(note)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
@@ -260,7 +279,7 @@ class NoteActivity : AppCompatActivity() {
 
 
         if (validateNote(title, desc)){
-            val note = Note( null,title,desc, " ",notification,"13 gru, 2022 21:00")
+            val note = Note( null,title,desc, " ", false, notification,"13 gru, 2022 21:00")
             runOnUiThread { repository.insertNoteToDabase(note) }
             return true
         }
@@ -276,6 +295,11 @@ class NoteActivity : AppCompatActivity() {
     private fun deleteNote(note: Note) {
 
         runOnUiThread { repository.delete(note) }
+    }
+
+    private fun archiviseNote(note: Note) {
+
+        runOnUiThread { repository.update(note) }
     }
 
     private fun updateNote(note: Note){

@@ -30,24 +30,51 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
     }
 
     fun setNotes(list: List<Note>){
-        super.submitList(list)
+        val listNotes : MutableList <Note> = mutableListOf()
+
+        for (note in list) {
+
+            if(note.archived == false ){
+                listNotes.add(note)
+            }
+
+        }
+
+        super.submitList(listNotes)
+    }
+
+    fun setNotesSearch(list: List<Note>, searched: String){ //Do wyszukiwania w notatkach, sprawdza tytuł i treść notatki czy zawiera wyszukiwane słowo
+        val listSearched : MutableList <Note> = mutableListOf()
+
+        for (note in list) {    //Najpierw tytuł
+            val title = note.title
+
+            if (title.contains(searched, true) == true) {
+                listSearched.add(note)
+            }
+        }
+
+        for (note in list) {    //Potem notatka
+            val description = note.content
+
+            if (description.contains(searched, true) == true) {
+                listSearched.add(note)
+            }
+        }
+
+        super.submitList(listSearched)
     }
 
     fun setNotesArchive(list: List<Note>){
         val listArchive : MutableList <Note> = mutableListOf()
 
-       /* for (note in list) {
-            val reminder = note.reminder
-            val reminderTime = reminder?.timeReminder + " " + reminder?.date
-            val pattern = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
-            val localDateTime = Date(reminderTime)
+        for (note in list) {
 
-            val currentTime: Date = Calendar.getInstance().getTime()
-
-            if(localDateTime>currentTime){
+            if(note.archived == true ){
                 listArchive.add(note)
             }
-        }*/
+
+        }
 
         super.submitList(listArchive)
     }
@@ -68,7 +95,6 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
         super.submitList(listReminders)
     }
-
 }
 
 class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(binding.root) {

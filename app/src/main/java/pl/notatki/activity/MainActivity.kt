@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
@@ -51,6 +52,14 @@ class MainActivity : AppCompatActivity() {
                 loadNotes()
             }
 
+            if(it.itemId == R.id.search){
+                val searchTest = R.id.search
+                val searched = R.id.search.toString()
+
+                binding.materialToolbar.title = searched
+                loadSearchNotes(searched)
+            }
+
             if(it.itemId == R.id.notes){
                 binding.materialToolbar.title = "Notatki Mobilne"
                 loadNotes()
@@ -69,10 +78,10 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        val note1 = Note(1,"Tytuł","Treść notatki",null,null,null)
+        val note1 = Note(1,"Tytuł","Treść notatki",null,false,null,null)
         note1.title = "Tytuł"
         note1.content = "treść"
-        val note2 = Note(2,"Tytuł","Treść notatki",null,null,null)
+        val note2 = Note(2,"Tytuł","Treść notatki",null, false,null,null)
         val arrList = arrayListOf<Note>()
 
         arrList.add(note1)
@@ -107,6 +116,26 @@ class MainActivity : AppCompatActivity() {
         repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
                 adapter.setNotesArchive(noteList)
+            }
+        }
+
+        if (value == "Notatka została zapisana" || value == "Notatka nie została zapisana"){
+            Snackbar.make(binding.root,
+                value, Snackbar.LENGTH_INDEFINITE).run {
+                setActionTextColor(resources.getColor(R.color.black))
+                setAction("OK") {
+
+                    dismiss()
+                }
+            }.show()
+        }
+    }
+
+    private fun loadSearchNotes(searched: String){
+        val value = intent.getStringExtra("info")
+        repository.getNotes { noteList: List<Note> ->
+            runOnUiThread {
+                adapter.setNotesSearch(noteList, searched)
             }
         }
 
