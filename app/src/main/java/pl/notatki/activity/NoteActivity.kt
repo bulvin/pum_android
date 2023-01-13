@@ -8,8 +8,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import pl.notatki.R
 import pl.notatki.databinding.ActivityNoteBinding
@@ -33,7 +35,9 @@ class NoteActivity : AppCompatActivity() {
     private var selectedImg = ""
     private val channelId = "notatki_przypomnienia" //Kanał dla przypomnień
 
-    private  val REQUEST_CODE_PICK_IMAGE = 1
+    private val REQUEST_CODE_PICK_IMAGE = 1     //Request code do wybierania obrazu z galerii
+    private val REQUEST_CODE_SPEECH_INPUT = 1   //Request code do notatki głosowej
+    private val MIC_STATUS = 0                  //Czy mikrofon jest włączony, czy nie
 
     companion object {
         const val EXTRAS_NOTE = "EXTRAS_NOTE"
@@ -146,6 +150,45 @@ class NoteActivity : AppCompatActivity() {
                 true).show()
         }
 
+        //Notatka głosowa
+        binding.voiceButton.setOnClickListener {
+            // on below line we are calling speech recognizer intent.
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+
+            // on below line we are passing language model
+            // and model free form in our intent
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+
+            // on below line we are passing our
+            // language as a default language.
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE,
+                Locale.getDefault()
+            )
+
+            // on below line we are specifying a prompt
+            // message as speak to text on below line.
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+
+            // on below line we are specifying a try catch block.
+            // in this block we are calling a start activity
+            // for result method and passing our result code.
+            try {
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+            } catch (e: Exception) {
+                // on below line we are displaying error message in toast
+                Toast
+                    .makeText(
+                        this, " " + e.message,
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            }
+        }
+
 
         binding.imageButon.setOnClickListener{ pickImg() }
 
@@ -212,6 +255,27 @@ class NoteActivity : AppCompatActivity() {
                 selectedImg = getPathImg(imageUri)!!
             }
 
+        }
+
+
+        //Część do notatki głosowej
+        // in this method we are checking request
+        // code with our result code.
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            // on below line we are checking if result code is ok
+            if (resultCode == RESULT_OK && data != null) {
+
+                // in that case we are extracting the
+                // data from our array list
+                val res: ArrayList<String> =
+                    data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+
+                // on below line we are setting data
+                // to our output text view.
+                binding.inputDesc.setText(
+                    Objects.requireNonNull(res)[0]
+                )
+            }
         }
     }
 
