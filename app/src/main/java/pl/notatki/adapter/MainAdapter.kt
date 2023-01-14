@@ -3,7 +3,6 @@ package pl.notatki.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +11,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import pl.notatki.R
 import pl.notatki.databinding.ItemMainBinding
 import pl.notatki.model.Note
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
@@ -27,24 +29,97 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
     }
 
-
-
     fun setNotes(list: List<Note>){
-        super.submitList(list)
+        val listNotes : MutableList <Note> = mutableListOf()
+
+        for (note in list) {
+
+            if(note.archived == false ){
+                listNotes.add(note)
+            }
+
+        }
+
+        super.submitList(listNotes)
     }
 
+    fun setNotesSearch(list: List<Note>, searched: String){ //Do wyszukiwania w notatkach, sprawdza tytuł i treść notatki czy zawiera wyszukiwane słowo
+        val listSearched : MutableList <Note> = mutableListOf()
+
+        for (note in list) {    //Najpierw tytuł
+            val title = note.title
+
+            if (title.contains(searched, true) == true) {
+                listSearched.add(note)
+            }
+        }
+
+        for (note in list) {    //Potem notatka
+            val description = note.content
+
+            if (description.contains(searched, true) == true) {
+                listSearched.add(note)
+            }
+        }
+
+        super.submitList(listSearched)
+    }
+
+    fun setNotesArchive(list: List<Note>){
+        val listArchive : MutableList <Note> = mutableListOf()
+
+        for (note in list) {
+
+            if(note.archived == true ){
+                listArchive.add(note)
+            }
+
+        }
+
+        super.submitList(listArchive)
+    }
+
+    fun setNotesReminders(list: List<Note>){
+        val listReminders : MutableList <Note> = mutableListOf()
+
+        for (note in list) {
+            val reminder = note.reminder
+            val reminderTime = reminder?.timeReminder + " " + reminder?.date
+
+            if (reminder != null) {
+                if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ){
+                    listReminders.add(note)
+                }
+            }
+        }
+
+        super.submitList(listReminders)
+    }
 }
-
-
 
 class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(binding.root) {
 
+
+
         fun bindTo(note: Note){
+            val reminder = note.reminder
+            val timeReminder = reminder?.timeReminder.toString() + "  "
+            val dateReminder = reminder?.date.toString() + "  "
+            val locationReminder = reminder?.location.toString() + "  "
+
             binding.cardView.setOnClickListener { onItemClickListener(note) }
             binding.noteTitle.text = note.title
             binding.noteContent.text = note.content
             binding.noteLabel.text = "Etykieta"
-            binding.noteReminder.text = "29 lis 2022, 18:00"
+            if (reminder != null) {
+                if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
+                    binding.noteReminder.text = timeReminder + dateReminder + locationReminder
+                } else {
+                    binding.noteReminder.visibility = View.GONE
+                }
+            } else {
+                binding.noteReminder.visibility = View.GONE
+            }
 
 
             if (note.image != ""){

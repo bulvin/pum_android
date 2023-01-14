@@ -21,9 +21,11 @@ data class Note(
     var title: String,
     var content: String,
     var image: String?,
+    var archived: Boolean,
     @Embedded
     var reminder: Reminder?,
-    var updated_at: String?
+    var updated_at: String?,
+
 ) : Parcelable{
 
 }
