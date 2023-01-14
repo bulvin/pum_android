@@ -204,7 +204,7 @@ class NoteActivity : AppCompatActivity() {
                     updateNote(note)
                 } else {
                     note.archived = false;
-                    binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
+                    binding.archiveButton.setImageResource(R.drawable.ic_archive)
                     updateNote(note)
                 }
             }
