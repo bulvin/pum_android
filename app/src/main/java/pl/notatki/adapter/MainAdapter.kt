@@ -1,6 +1,7 @@
 package pl.notatki.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
@@ -45,10 +46,17 @@ class MainViewHolder(private val binding: ItemMainBinding, private val onItemCli
             binding.noteLabel.text = "Etykieta"
             binding.noteReminder.text = "29 lis 2022, 18:00"
 
-            Glide.with(itemView)
-                .load(note.image)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.noteImg)
+
+            if (note.image != ""){
+                Glide.with(itemView)
+                    .load(note.image)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(binding.noteImg)
+            }
+            else{
+                binding.noteImg.visibility = View.GONE
+            }
+
         }
 
 }

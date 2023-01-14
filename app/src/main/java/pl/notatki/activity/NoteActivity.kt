@@ -178,7 +178,7 @@ class NoteActivity : AppCompatActivity() {
 
 
     private fun formatterReminder(calendar: Calendar) {
-        val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy", Locale.UK)
+        val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy")
         //val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
         val buttonReminder = binding.buttonReminder
         buttonReminder.text = formatter.format(calendar.time)
@@ -187,12 +187,12 @@ class NoteActivity : AppCompatActivity() {
     private fun addNote() : Boolean{
         val title = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
-        val img = binding.noteImg.context.toString()
+        val img = selectedImg
         val label = null
         val notification = null
 
         if (validateNote(title, desc)){
-            val note = Note( null,title,desc, " ",notification,"13 gru, 2022 21:00")
+            val note = Note( null,title,desc, img,notification,"13 gru, 2022 21:00")
             runOnUiThread { repository.insertNoteToDabase(note) }
             return true
         }
