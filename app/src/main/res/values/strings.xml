@@ -2,4 +2,5 @@
     <string name="app_name">Mobilne Notatki</string>
     <string name="button">Button</string>
     <string name="textview">TextView</string>
+    <string name="storage_permission_text">Aplikacja potrzebuję dostępu do danych</string>
 </resources>

@@ -1,5 +1,6 @@
 package pl.notatki.activity
 
+import android.Manifest
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -13,22 +14,26 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import pl.notatki.R
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
 import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class NoteActivity : AppCompatActivity() {
+class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,EasyPermissions.RationaleCallbacks {
 
     private lateinit var notificationManager : NotificationManager
     private lateinit var notificationChannel : NotificationChannel
     private lateinit var builder : Notification.Builder
     private var channelID = "pl.notatki.activity"
-
+    private var READ_STORAGE_PERM = 123;
+    private var WRITE_STORAGE_PERM = 123;
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
     private var edit: Boolean = false
@@ -36,7 +41,7 @@ class NoteActivity : AppCompatActivity() {
     private val channelId = "notatki_przypomnienia" //Kanał dla przypomnień
 
     private val REQUEST_CODE_PICK_IMAGE = 1     //Request code do wybierania obrazu z galerii
-    private val REQUEST_CODE_SPEECH_INPUT = 1   //Request code do notatki głosowej
+    private val REQUEST_CODE_SPEECH_INPUT = 2   //Request code do notatki głosowej
     private val MIC_STATUS = 0                  //Czy mikrofon jest włączony, czy nie
 
     companion object {
@@ -189,7 +194,7 @@ class NoteActivity : AppCompatActivity() {
             }
         }
 
-
+        readStorageTask()
         binding.imageButon.setOnClickListener{ pickImg() }
 
 
@@ -267,8 +272,8 @@ class NoteActivity : AppCompatActivity() {
 
                 // in that case we are extracting the
                 // data from our array list
-                val res: ArrayList<String> =
-                    data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                val res: ArrayList<String?> =
+                    data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String?>
 
                 // on below line we are setting data
                 // to our output text view.
@@ -390,6 +395,51 @@ class NoteActivity : AppCompatActivity() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(galleryIntent, REQUEST_CODE_PICK_IMAGE)
 
+    }
+    private fun isReadStoragePermission() : Boolean {
+        return EasyPermissions.hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
+    private fun isWriteStoragePermission() : Boolean {
+                return EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+
+    private fun readStorageTask(){
+            if(isReadStoragePermission()){
+                Toast.makeText(this, "przyznano dostęp",Toast.LENGTH_SHORT).show()
+            }else{
+                EasyPermissions.requestPermissions(this,
+                    getString(R.string.storage_permission_text),
+                            READ_STORAGE_PERM ,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+       if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)){
+           AppSettingsDialog.Builder(this).build().show()
+       }
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onRationaleAccepted(requestCode: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onRationaleDenied(requestCode: Int) {
+        TODO("Not yet implemented")
     }
 }
 
