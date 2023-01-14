@@ -52,10 +52,15 @@ class ArchiveViewHolder(private val binding: ItemMainBinding, private val onItem
                 binding.noteReminder.visibility = View.GONE
             }
 
-            Glide.with(itemView)
-                .load(R.drawable.img)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.noteImg)
+            if (note.image != ""){
+                Glide.with(itemView)
+                    .load(R.drawable.img)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(binding.noteImg)
+            } else {
+                binding.noteImg.visibility = View.GONE;
+            }
+
         }
 
 }

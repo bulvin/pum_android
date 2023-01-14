@@ -17,6 +17,9 @@ import java.util.*
 
 class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
 
+
+    private var originalList: List<Note> = ArrayList()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
        val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMainBinding.inflate(inflater, parent, false)
@@ -34,13 +37,14 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
         for (note in list) {
 
-            if(note.archived == false ){
+            if(!note.archived){
                 listNotes.add(note)
+
             }
 
         }
-
-        super.submitList(listNotes)
+        originalList = listNotes
+        super.submitList(originalList)
     }
 
     fun setNotesSearch(list: List<Note>, searched: String){ //Do wyszukiwania w notatkach, sprawdza tytuł i treść notatki czy zawiera wyszukiwane słowo
@@ -95,6 +99,13 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
         super.submitList(listReminders)
     }
+    fun setData(list: List<Note>){
+        originalList = list
+        super.submitList(list)
+    }
+    fun filter(newText: String) {
+            submitList(originalList.filter { note -> note.title.contains(newText, ignoreCase = true) })
+    }
 }
 
 class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(binding.root) {
@@ -122,14 +133,14 @@ class MainViewHolder(private val binding: ItemMainBinding, private val onItemCli
             }
 
 
-            if (note.image != ""){
+            if (note.image != null){
                 Glide.with(itemView)
                     .load(note.image)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(binding.noteImg)
             }
-            else{
-                binding.noteImg.visibility = View.GONE
+            if (note.image == ""){
+                binding.noteImg.visibility = View.GONE;
             }
 
         }

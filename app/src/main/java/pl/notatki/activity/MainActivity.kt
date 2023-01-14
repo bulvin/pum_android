@@ -4,6 +4,11 @@ package pl.notatki.activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+//import androidx.appcompat.widget.SearchView
+import android.widget.SearchView
+import android.app.SearchManager;
+
+import android.widget.SearchView.OnQueryTextListener;
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import pl.notatki.R
@@ -32,8 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
+
 
         val buttonAddNote = binding.addNote
         buttonAddNote.setOnClickListener {
@@ -78,9 +82,22 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        val searchItem = binding.materialToolbar.menu.findItem(R.id.search)
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return  false
+            }
 
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapter.filter(newText)
+                return true
+            }
+
+        })
         //adapter.submitList(arrList)
-
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
         loadNotes()
         }
 
