@@ -111,7 +111,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             if(note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
                 binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
             } else {
-                binding.archiveButton.setImageResource(R.drawable.ic_archive)
+                binding.archiveButton.setImageResource(R.drawable.ic_baseline_archive_24)
             }
         }
 
@@ -219,7 +219,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                     updateNote(note)
                 } else {
                     note.archived = false;
-                    binding.archiveButton.setImageResource(R.drawable.ic_archive)
+                    binding.archiveButton.setImageResource(R.drawable.ic_baseline_archive_24)
                     updateNote(note)
                 }
             }
@@ -323,8 +323,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     }
 
     private fun sendNotification() {
-        val name = binding.inputTitle.toString()
-        val desc = binding.inputDesc.toString()
+        val name = binding.inputTitle.text.toString()
+        val desc = binding.inputDesc.text.toString()
         Log.d("Test", "Próba tworzenia notyfikacji")
 
         val intent = Intent(this,NoteActivity::class.java)
