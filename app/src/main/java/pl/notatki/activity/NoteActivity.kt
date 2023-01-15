@@ -5,16 +5,20 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.FileProvider
+import pl.notatki.BuildConfig
 import pl.notatki.R
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Note
@@ -22,6 +26,8 @@ import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,8 +38,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     private lateinit var notificationChannel : NotificationChannel
     private lateinit var builder : Notification.Builder
     private var channelID = "pl.notatki.activity"
-    private var READ_STORAGE_PERM = 123;
-    private var WRITE_STORAGE_PERM = 123;
+    private var READ_STORAGE_PERM : Int = 123
+    private var  WRITE_STORAGE_PERM = 123
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
     private var edit: Boolean = false
@@ -42,7 +48,10 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
     private val REQUEST_CODE_PICK_IMAGE = 1     //Request code do wybierania obrazu z galerii
     private val REQUEST_CODE_SPEECH_INPUT = 2   //Request code do notatki głosowej
+    private val REQUEST_CODE_IMAGE_CAPTURE = 3
     private val MIC_STATUS = 0                  //Czy mikrofon jest włączony, czy nie
+
+    private var photoPath: String = "";
 
     companion object {
         const val EXTRAS_NOTE = "EXTRAS_NOTE"
@@ -194,8 +203,9 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             }
         }
 
-        readStorageTask()
-        binding.imageButon.setOnClickListener{ pickImg() }
+
+        binding.imageButon.setOnClickListener{   pickImg() }
+        binding.photoButton.setOnClickListener  { takePhoto() }
 
 
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
@@ -261,7 +271,19 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             }
 
         }
+        if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
+            Toast.makeText(this, "Picture saved to: $photoPath", Toast.LENGTH_SHORT).show()
 
+
+
+            val bmOptions = BitmapFactory.Options()
+            var bitmap = BitmapFactory.decodeFile(photoPath, bmOptions)
+
+            binding.noteImg.setImageBitmap(bitmap)
+            binding.noteImg.visibility = View.VISIBLE
+            selectedImg = photoPath
+
+        }
 
         //Część do notatki głosowej
         // in this method we are checking request
@@ -360,7 +382,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     }
 
     private fun validateNote(title: String, desc: String): Boolean {
-        if (title.isEmpty() || title == " " && desc.isEmpty() || desc == "" ){
+        if (title.isEmpty()  && desc.isEmpty() && selectedImg == "" ){
             return false
         }
         return true
@@ -392,6 +414,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     }
 
     private fun pickImg(){
+        readStorageTask()
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(galleryIntent, REQUEST_CODE_PICK_IMAGE)
 
@@ -403,8 +426,21 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 return EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
 
+
+    private fun writeStorageTask(){
+        if(isWriteStoragePermission()){
+
+        }else{
+            EasyPermissions.requestPermissions(this,
+                getString(R.string.storage_permission_text),
+                WRITE_STORAGE_PERM ,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+    }
+
     private fun readStorageTask(){
             if(isReadStoragePermission()){
+
                 Toast.makeText(this, "przyznano dostęp",Toast.LENGTH_SHORT).show()
             }else{
                 EasyPermissions.requestPermissions(this,
@@ -413,7 +449,40 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 Manifest.permission.READ_EXTERNAL_STORAGE)
             }
     }
+    fun takePhoto() {
+        writeStorageTask()
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    Toast.makeText(this, "Error creating file", Toast.LENGTH_SHORT).show()
+                    null
+                }
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE)
+                }
+            }
+        }
+    }
 
+    private fun createImageFile(): File {
+        val timeStamp: String = SimpleDateFormat("dd.MM.yyyy HH:mm").format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_",
+            ".jpg",
+            storageDir
+        ).apply {
+            photoPath = absolutePath
+        }
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -425,9 +494,9 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-       if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)){
-           AppSettingsDialog.Builder(this).build().show()
-       }
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)){
+            AppSettingsDialog.Builder(this).build().show()
+        }
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
@@ -441,5 +510,14 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     override fun onRationaleDenied(requestCode: Int) {
         TODO("Not yet implemented")
     }
+
+
 }
+
+
+
+
+
+
+
 
