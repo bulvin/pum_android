@@ -100,6 +100,8 @@ class MainActivity : AppCompatActivity() {
         loadNotes()
         }
 
+
+
     private fun loadReminderNotes(){
         val value = intent.getStringExtra("info")
         repository.getNotes { noteList: List<Note> ->

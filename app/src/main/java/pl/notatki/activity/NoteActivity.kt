@@ -13,20 +13,20 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
-import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.view.marginLeft
-import androidx.core.view.setMargins
 import pl.notatki.BuildConfig
 import pl.notatki.R
+import pl.notatki.adapter.NotificationReceiver
 import pl.notatki.databinding.ActivityNoteBinding
 import pl.notatki.model.Label
 import pl.notatki.model.Note
-import pl.notatki.model.NoteWithLabels
 import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
 import pub.devrel.easypermissions.AppSettingsDialog
@@ -39,22 +39,22 @@ import java.util.*
 
 class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,EasyPermissions.RationaleCallbacks {
 
-    private lateinit var notificationManager : NotificationManager
-    private lateinit var notificationChannel : NotificationChannel
-    private lateinit var builder : Notification.Builder
+
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var notificationChannel: NotificationChannel
+    private lateinit var builder: Notification.Builder
     private var channelID = "pl.notatki.activity"
-    private var READ_STORAGE_PERM : Int = 123
-    private var  WRITE_STORAGE_PERM = 123
+    private var READ_STORAGE_PERM: Int = 123
+    private var WRITE_STORAGE_PERM = 123
     private lateinit var binding: ActivityNoteBinding
     private val repository: NoteRepository by lazy { NoteRepository(applicationContext) }
     private var edit: Boolean = false
     private var selectedImg = ""
-    private val channelId = "notatki_przypomnienia" //Kanał dla przypomnień
 
     private val REQUEST_CODE_PICK_IMAGE = 1     //Request code do wybierania obrazu z galerii
     private val REQUEST_CODE_SPEECH_INPUT = 2   //Request code do notatki głosowej
     private val REQUEST_CODE_IMAGE_CAPTURE = 3
-    private val MIC_STATUS = 0                  //Czy mikrofon jest włączony, czy nie
+
 
     private var photoPath: String = "";
 
@@ -68,11 +68,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
     }
 
-      override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //createNotificationChannel()
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -80,10 +82,10 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         buttonNoteActivity.setOnClickListener {
             val main = Intent(this, MainActivity::class.java)
             val message: String
-            if(addNote() && !edit){
-                 message = "Notatka została zapisana"
-            }else{
-                  message =  "Notatka nie została zapisana"
+            if (addNote() && !edit) {
+                message = "Notatka została zapisana"
+            } else {
+                message = "Notatka nie została zapisana"
             }
             main.putExtra("info", message)
             startActivity(main)
@@ -94,12 +96,11 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         var labels = ArrayList<Label>()
 
         val buttonAddLabel = binding.buttonAddTags
-       binding.buttonAddTags.setOnClickListener  {
+        binding.buttonAddTags.setOnClickListener {
 
-           showAddLabelDialog()
+            showAddLabelDialog()
 
 //            //Tylko do testowania notyfikacji na razie, bo jedyny wolny button, można usunąć
-////            sendNotification()
         }
 
         //Remindeers
@@ -109,13 +110,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             val reminder = note.reminder
             if (reminder != null) { //Sprawdza czy przypomnienie nie jest puste i na podstawie tego wyświetla je, albo nie
-                if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
+                if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "") {
                     buttonReminder.visibility = View.VISIBLE
-                    buttonReminder.text = reminder.timeReminder + reminder.date + reminder.location
+                    buttonReminder.text = reminder.timeReminder +" "+ reminder.date
                 }
             }
 
-            if(note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
+            if (note.archived == true) { //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
                 binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
             } else {
                 binding.archiveButton.setImageResource(R.drawable.ic_baseline_archive_24)
@@ -124,7 +125,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
 
         val buttonAddReminder = binding.buttonAddReminder
-        val reminder = Reminder("","","")
+        val reminder = Reminder("", "", "")
 
         val calendar = Calendar.getInstance()
 
@@ -134,7 +135,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             calendar.set(Calendar.MINUTE, minute)
             formatterReminder(calendar)
 
-            val formatterTime = SimpleDateFormat("hh:mm", Locale.UK)
+            val formatterTime = SimpleDateFormat("hh:mm", Locale.getDefault())
             reminder.timeReminder = formatterTime.format(calendar.time)
         }
 
@@ -150,9 +151,9 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
 
         //Dodaje przycisk Reminder
-        buttonAddReminder.setOnClickListener  {
+        buttonAddReminder.setOnClickListener {
 
-            if(buttonReminder.visibility == View.GONE){
+            if (buttonReminder.visibility == View.GONE) {
                 buttonReminder.visibility = View.VISIBLE
                 buttonAddReminder.text = "Przypomnienie-"
 
@@ -165,11 +166,15 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         //Otwiera date i time pickery
         buttonReminder.setOnClickListener {
-            DatePickerDialog(this, datePicker, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.YEAR)).show()
+            DatePickerDialog(
+                this, datePicker, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.YEAR)
+            ).show()
 
-            TimePickerDialog(this, timePicker, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
-                true).show()
+            TimePickerDialog(
+                this, timePicker, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
+                true
+            ).show()
         }
 
         //Notatka głosowa
@@ -206,8 +211,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
 
 
-        binding.imageButon.setOnClickListener{   pickImg() }
-        binding.photoButton.setOnClickListener  { takePhoto() }
+        binding.imageButon.setOnClickListener { pickImg() }
+        binding.photoButton.setOnClickListener { takePhoto() }
 
         binding.noteImg.visibility = View.GONE
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
@@ -215,7 +220,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             edit = true
 
             binding.archiveButton.setOnClickListener {
-                if(note.archived == false){
+                if (note.archived == false) {
                     note.archived = true;
                     binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
                     updateNote(note)
@@ -226,24 +231,33 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 }
             }
 
-            binding.deleteButton.setOnClickListener{ deleteNote(note)
+            binding.deleteButton.setOnClickListener {
+                deleteNote(note)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
             }
-            binding.returnButton.setOnClickListener{
+            binding.returnButton.setOnClickListener {
                 note.title = binding.inputTitle.text.toString()
                 note.content = binding.inputDesc.text.toString()
-                if (selectedImg == ""){
+                if (selectedImg == "") {
                     note.image = note.image.toString()
-                }else{
+                } else {
                     note.image = selectedImg
                 }
 
-                if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ){
+                if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "") {
                     note.reminder = reminder
-                } else {
+
+                    val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy")
+
+                    //function for Creating [Notification Channel][1]
+                    createNotificationChannel();
+                    //function for scheduling the notification
+                    scheduleNotification(calendar);
+                } /*else {
                     note.reminder = null
-                }
+                }*/
+
 
 
 
@@ -263,7 +277,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         if (requestCode == REQUEST_CODE_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             // pobieramy URI obrazka z intentu
             val imageUri = data?.data
-            if (imageUri != null){
+            if (imageUri != null) {
                 // wczytujemy obrazek do pamięci
                 val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
 
@@ -280,11 +294,11 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
             val bmOptions = BitmapFactory.Options()
             var bitmap = BitmapFactory.decodeFile(photoPath, bmOptions)
-            if (bitmap != null){
+            if (bitmap != null) {
                 binding.noteImg.setImageBitmap(bitmap)
                 binding.noteImg.visibility = View.VISIBLE
                 selectedImg = photoPath
-            }else{
+            } else {
                 Toast.makeText(this, "Nie wykonano zdjęcia", Toast.LENGTH_SHORT).show()
             }
 
@@ -312,13 +326,12 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
     }
 
-    private fun getPathImg(contentUri: Uri) : String?{
+    private fun getPathImg(contentUri: Uri): String? {
         var path: String? = null
         val cursor: Cursor? = contentResolver.query(contentUri, null, null, null, null)
-        if (cursor == null){
+        if (cursor == null) {
             path = contentUri.path
-        }
-        else {
+        } else {
             cursor.moveToFirst()
             val index = cursor.getColumnIndex("_data")
             path = cursor.getString(index)
@@ -328,44 +341,102 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         return path
     }
 
-    private fun sendNotification() {
+    fun createNotificationChannel() {
+        val id = "channelID"
+        val name = "Daily Alerts"
+        val des = "Channel Description A Brief"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(id, name, importance)
+        channel.description = des
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
+    }
+
+    fun scheduleNotification(calendar: Calendar) {
         val name = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
-        Log.d("Test", "Próba tworzenia notyfikacji")
 
-        val intent = Intent(this,NoteActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this,0,intent, PendingIntent.FLAG_IMMUTABLE)
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            notificationChannel = NotificationChannel(channelID,name, NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.createNotificationChannel(notificationChannel)
-
-            Log.d("Test", "Próba tworzenia notyfikacji 2")
-
-            builder = Notification.Builder(this,channelID)
-                .setContentTitle(name)
-                .setContentText(desc)
-                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                .setContentIntent(pendingIntent)
-        } else {
-            builder = Notification.Builder(this)
-                .setContentTitle(name)
-                .setContentText(desc)
-                .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                .setContentIntent(pendingIntent)
+        val intent = Intent(applicationContext, NotificationReceiver::class.java)
+        intent.putExtra("titleExtra", name)
+        intent.putExtra("textExtra", desc)
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            intent.putExtra("notificationExtra", note.noteId!!)
         }
 
-        notificationManager.notify(101,builder.build())
-        Log.d("Test", notificationChannel.id.toString())
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            1,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        //Testowy czas. 5 sekund od utworzenia
+        //val calendarTest = Calendar.getInstance()
+        //calendarTest.add(Calendar.SECOND, 30)
+
+        val date: Date = calendar.getTime()
+        val longDate: Long = date.getTime()
+
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            longDate,
+            pendingIntent
+        )
+
+        val format = SimpleDateFormat("hh:mm dd-MM-yyyy")
+        var time = format.format(calendar.getTime())
+
+        Toast.makeText(applicationContext, time, Toast.LENGTH_LONG).show()
+    }
+
+    //Działająca notyfikacja
+    private fun sendNotification(calendar: Calendar) {
+        val name = binding.inputTitle.text.toString()
+        val desc = binding.inputDesc.text.toString()
+
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            val reminder = note.reminder
+
+            //val hour = reminder?.timeReminder.toString()
+            //val date = reminder?.date.toString()
+
+            var notificationID = 101
+            notificationID = note.noteId!!
+
+            val intent = Intent(this, MainActivity::class.java)
+            val pendingIntent =
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationChannel =
+                    NotificationChannel(channelID, name, NotificationManager.IMPORTANCE_HIGH)
+                notificationManager.createNotificationChannel(notificationChannel)
+
+                builder = Notification.Builder(this, channelID)
+                    .setContentTitle(name)
+                    .setContentText(desc)
+                    .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
+                    .setContentIntent(pendingIntent)
+            } else {
+                builder = Notification.Builder(this)
+                    .setContentTitle(name)
+                    .setContentText(desc)
+                    .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
+                    .setContentIntent(pendingIntent)
+            }
+
+            notificationManager.notify(notificationID, builder.build())
+        }
     }
 
     private fun formatterReminder(calendar: Calendar) {
-
         val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy")
 
-        //val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.UK)
         val buttonReminder = binding.buttonReminder
         buttonReminder.text = formatter.format(calendar.time)
+        val notificationTime = formatter.format(calendar.time);
+
     }
 
     private fun addNote() : Boolean{
@@ -396,11 +467,6 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     private fun deleteNote(note: Note) {
 
         runOnUiThread { repository.delete(note) }
-    }
-
-    private fun archiviseNote(note: Note) {
-
-        runOnUiThread { repository.update(note) }
     }
 
     private fun updateNote(note: Note){
@@ -570,6 +636,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
 
 }
+
+
 
 
 
