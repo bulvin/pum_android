@@ -135,7 +135,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             calendar.set(Calendar.MINUTE, minute)
             formatterReminder(calendar)
 
-            val formatterTime = SimpleDateFormat("hh:mm", Locale.getDefault())
+            val formatterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
             reminder.timeReminder = formatterTime.format(calendar.time)
         }
 
@@ -146,7 +146,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             calendar.set(Calendar.YEAR, year)
             formatterReminder(calendar)
 
-            val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
             reminder.date = formatterDate.format(calendar.time)
         }
 
@@ -248,7 +248,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "") {
                     note.reminder = reminder
 
-                    val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy")
+                    val formatter = SimpleDateFormat("HH:mm dd-MM-yyyy")
 
                     //function for Creating [Notification Channel][1]
                     createNotificationChannel();
@@ -257,9 +257,6 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 } /*else {
                     note.reminder = null
                 }*/
-
-
-
 
                 updateNote(note)
                 val main = Intent(this, MainActivity::class.java)
@@ -384,7 +381,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             pendingIntent
         )
 
-        val format = SimpleDateFormat("hh:mm dd-MM-yyyy")
+        val format = SimpleDateFormat("HH:mm dd-MM-yyyy")
         var time = format.format(calendar.getTime())
 
         Toast.makeText(applicationContext, time, Toast.LENGTH_LONG).show()
@@ -431,7 +428,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     }
 
     private fun formatterReminder(calendar: Calendar) {
-        val formatter = SimpleDateFormat("hh:mm dd-MM-yyyy")
+        val formatter = SimpleDateFormat("HH:mm dd-MM-yyyy")
 
         val buttonReminder = binding.buttonReminder
         buttonReminder.text = formatter.format(calendar.time)
@@ -450,7 +447,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         if (validateNote(title, desc)){
 
-            val note = Note( null,title,desc, img, false, Label(null, "Test"),notification,"13 gru, 2022 21:00")
+            val note = Note( 0,title,desc, img, false, Label(null, "Test"),notification,"13 gru, 2022 21:00")
 
             runOnUiThread { repository.insertNoteToDabase(note) }
             return true

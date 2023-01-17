@@ -17,7 +17,7 @@ private val timeFormat = SimpleDateFormat("HH:mm")
 @Parcelize
 data class Note(
     @PrimaryKey(autoGenerate = true)
-    var noteId: Int?,
+    var noteId: Int,
     var title: String,
     var content: String,
     var image: String?,
