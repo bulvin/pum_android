@@ -15,6 +15,7 @@ import pl.notatki.R
 import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityMainBinding
 import pl.notatki.model.Note
+import pl.notatki.model.NoteWithLabels
 import pl.notatki.repository.NoteRepository
 
 
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadReminderNotes(){
         val value = intent.getStringExtra("info")
-        repository.getNotes { noteList: List<Note> ->
+        repository.getAll { noteList: List<NoteWithLabels> ->
             runOnUiThread {
                 adapter.setNotesReminders(noteList)
             }
@@ -123,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadArchiveNotes(){
         val value = intent.getStringExtra("info")
-        repository.getNotes { noteList: List<Note> ->
+        repository.getAll { noteList: List<NoteWithLabels> ->
             runOnUiThread {
                 adapter.setNotesArchive(noteList)
             }
@@ -143,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadSearchNotes(searched: String){
         val value = intent.getStringExtra("info")
-        repository.getNotes { noteList: List<Note> ->
+        repository.getAll { noteList: List<NoteWithLabels> ->
             runOnUiThread {
                 adapter.setNotesSearch(noteList, searched)
             }
@@ -164,7 +165,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadNotes() {
 
         val value = intent.getStringExtra("info")
-        repository.getNotes { noteList: List<Note> ->
+        repository.getAll { noteList: List<NoteWithLabels> ->
             runOnUiThread {
                 adapter.setNotes(noteList)
             }

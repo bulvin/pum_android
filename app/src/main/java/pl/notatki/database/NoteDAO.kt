@@ -6,10 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import pl.notatki.model.Label
-import pl.notatki.model.Note
-import pl.notatki.model.NoteWithLabels
-import pl.notatki.model.Reminder
+import pl.notatki.model.*
 
 @Dao
 interface NoteDAO {
@@ -34,6 +31,7 @@ interface NoteDAO {
     @Query("SELECT * FROM Label")
     fun getLabels(): List<Label>
 
+
     @Insert
     fun insertLabel(label: Label)
 
@@ -42,5 +40,13 @@ interface NoteDAO {
 
     @Update
     fun updateLabel(label: Label)
+
+    @Query("SELECT * FROM label")
+    fun getLabelForDialog() : List<Label>
+
+    @Insert
+    fun insertNoteWithLabels(note: NoteLabelCrossRef)
+
+
 
 }

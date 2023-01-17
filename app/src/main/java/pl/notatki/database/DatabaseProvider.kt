@@ -13,6 +13,7 @@ object DatabaseProvider {
 
     private fun buildDatabase(context: Context) = Room
         .databaseBuilder(context, AppDatabase::class.java, "notes-database")
+        .allowMainThreadQueries()
         .fallbackToDestructiveMigration()
         .build()
 

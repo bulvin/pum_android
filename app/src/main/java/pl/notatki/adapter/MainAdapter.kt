@@ -8,17 +8,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import pl.notatki.R
 import pl.notatki.databinding.ItemMainBinding
-import pl.notatki.model.Note
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
+import pl.notatki.model.NoteWithLabels
 
-class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter<Note, MainViewHolder>(DIFF_CALLBACK) {
+class MainAdapter(private val onItemClickListener: (NoteWithLabels) -> Unit) : ListAdapter<NoteWithLabels, MainViewHolder>(DIFF_CALLBACK) {
 
 
-    private var originalList: List<Note> = ArrayList()
+    private var originalList: List<NoteWithLabels> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
        val inflater = LayoutInflater.from(parent.context)
@@ -32,12 +28,12 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
     }
 
-    fun setNotes(list: List<Note>){
-        val listNotes : MutableList <Note> = mutableListOf()
+    fun setNotes(list: List<NoteWithLabels>){
+        val listNotes : MutableList <NoteWithLabels> = mutableListOf()
 
         for (note in list) {
 
-            if(!note.archived){
+            if(!note.note.archived){
                 listNotes.add(note)
 
             }
@@ -47,11 +43,11 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
         super.submitList(originalList)
     }
 
-    fun setNotesSearch(list: List<Note>, searched: String){ //Do wyszukiwania w notatkach, sprawdza tytuł i treść notatki czy zawiera wyszukiwane słowo
-        val listSearched : MutableList <Note> = mutableListOf()
+    fun setNotesSearch(list: List<NoteWithLabels>, searched: String){ //Do wyszukiwania w notatkach, sprawdza tytuł i treść notatki czy zawiera wyszukiwane słowo
+        val listSearched : MutableList <NoteWithLabels> = mutableListOf()
 
         for (note in list) {    //Najpierw tytuł
-            val title = note.title
+            val title = note.note.title
 
             if (title.contains(searched, true) == true) {
                 listSearched.add(note)
@@ -59,7 +55,7 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
         }
 
         for (note in list) {    //Potem notatka
-            val description = note.content
+            val description = note.note.content
 
             if (description.contains(searched, true) == true) {
                 listSearched.add(note)
@@ -69,12 +65,12 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
         super.submitList(listSearched)
     }
 
-    fun setNotesArchive(list: List<Note>){
-        val listArchive : MutableList <Note> = mutableListOf()
+    fun setNotesArchive(list: List<NoteWithLabels>){
+        val listArchive : MutableList <NoteWithLabels> = mutableListOf()
 
         for (note in list) {
 
-            if(note.archived == true ){
+            if(note.note.archived == true ){
                 listArchive.add(note)
             }
 
@@ -83,11 +79,11 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
         super.submitList(listArchive)
     }
 
-    fun setNotesReminders(list: List<Note>){
-        val listReminders : MutableList <Note> = mutableListOf()
+    fun setNotesReminders(list: List<NoteWithLabels>){
+        val listReminders : MutableList <NoteWithLabels> = mutableListOf()
 
         for (note in list) {
-            val reminder = note.reminder
+            val reminder = note.note.reminder
             val reminderTime = reminder?.timeReminder + " " + reminder?.date
 
             if (reminder != null) {
@@ -99,28 +95,28 @@ class MainAdapter(private val onItemClickListener: (Note) -> Unit) : ListAdapter
 
         super.submitList(listReminders)
     }
-    fun setData(list: List<Note>){
+    fun setData(list: List<NoteWithLabels>){
         originalList = list
         super.submitList(list)
     }
     fun filter(newText: String) {
-            submitList(originalList.filter { note -> note.title.contains(newText, ignoreCase = true) })
+            submitList(originalList.filter { note -> note.note.title.contains(newText, ignoreCase = true) })
     }
 }
 
-class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(binding.root) {
+class MainViewHolder(private val binding: ItemMainBinding, private val onItemClickListener: (NoteWithLabels) -> Unit) : RecyclerView.ViewHolder(binding.root) {
 
 
 
-        fun bindTo(note: Note){
-            val reminder = note.reminder
+        fun bindTo(note: NoteWithLabels){
+            val reminder = note.note.reminder
             val timeReminder = reminder?.timeReminder.toString() + "  "
             val dateReminder = reminder?.date.toString() + "  "
             val locationReminder = reminder?.location.toString() + "  "
 
             binding.cardView.setOnClickListener { onItemClickListener(note) }
-            binding.noteTitle.text = note.title
-            binding.noteContent.text = note.content
+            binding.noteTitle.text = note.note.title
+            binding.noteContent.text = note.note.content
             binding.noteLabel.text = "Etykieta"
             if (reminder != null) {
                 if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
@@ -133,25 +129,25 @@ class MainViewHolder(private val binding: ItemMainBinding, private val onItemCli
             }
 
 
-            if (note.image != null){
+            if (note.note.image != null){
                 Glide.with(itemView)
-                    .load(note.image)
+                    .load(note.note.image)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(binding.noteImg)
             }
-            if (note.image == ""){
+            if (note.note.image == ""){
                 binding.noteImg.visibility = View.GONE;
             }
 
         }
 
 }
-private val DIFF_CALLBACK: DiffUtil.ItemCallback<Note> = object : DiffUtil.ItemCallback<Note>(){
-    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-        return oldItem.noteId == newItem.noteId
+private val DIFF_CALLBACK: DiffUtil.ItemCallback<NoteWithLabels> = object : DiffUtil.ItemCallback<NoteWithLabels>(){
+    override fun areItemsTheSame(oldItem: NoteWithLabels, newItem: NoteWithLabels): Boolean {
+        return oldItem.note.noteId == newItem.note.noteId
     }
 
-    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+    override fun areContentsTheSame(oldItem: NoteWithLabels, newItem: NoteWithLabels): Boolean {
         return  oldItem == newItem
     }
 

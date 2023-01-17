@@ -1,11 +1,11 @@
 package pl.notatki.activity
 
+
 import android.Manifest
 import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -15,13 +15,18 @@ import android.provider.MediaStore
 import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.marginLeft
+import androidx.core.view.setMargins
 import pl.notatki.BuildConfig
 import pl.notatki.R
 import pl.notatki.databinding.ActivityNoteBinding
+import pl.notatki.model.Label
 import pl.notatki.model.Note
+import pl.notatki.model.NoteWithLabels
 import pl.notatki.model.Reminder
 import pl.notatki.repository.NoteRepository
 import pub.devrel.easypermissions.AppSettingsDialog
@@ -56,14 +61,14 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     companion object {
         const val EXTRAS_NOTE = "EXTRAS_NOTE"
 
-        fun start(activity: Activity, note: Note) {
+        fun start(activity: Activity, note: NoteWithLabels) {
             val intent = Intent(activity, NoteActivity::class.java)
             intent.putExtra(EXTRAS_NOTE, note)
             activity.startActivity(intent)
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+      override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityNoteBinding.inflate(layoutInflater)
@@ -87,20 +92,58 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
 
 
-        //Labels
-        val buttonAddLabel = binding.buttonAddTags
-        buttonAddLabel.setOnClickListener  {
 
-            //Tylko do testowania notyfikacji na razie, bo jedyny wolny button, można usunąć
-            sendNotification()
+        var labels = ArrayList<Label>()
+
+        val buttonAddLabel = binding.buttonAddTags
+       binding.buttonAddTags.setOnClickListener  {
+
+           showAddLabelDialog()
+//           val builder = AlertDialog.Builder(this)
+//           builder.setTitle("Wybierz etykiety")
+//
+//           val checkBoxes = ArrayList<CheckBox>()
+//           val layout = LinearLayout(this)
+//           val listView = ListView(this)
+//           listView.addView(layout)
+//
+//
+//
+//            layout.orientation = LinearLayout.VERTICAL
+//
+//            for (label in labels) {
+//                val checkBox = CheckBox(this)
+//                checkBox.text = label.toString()
+//                layout.addView(checkBox)
+//                checkBoxes.add(checkBox)
+//            }
+//            builder.setView(listView)
+//
+//
+//            builder.setPositiveButton("OK") { _, _ ->
+//                val selectedLabels = StringBuilder()
+//                for (i in checkBoxes.indices) {
+//                    if (checkBoxes[i].isChecked) {
+//                        selectedLabels.append(labels[i]).append(" ")
+//                    }
+//                }
+//                binding.textNoteLabel.text = selectedLabels.toString()
+//                binding.textNoteLabel.visibility = View.VISIBLE
+//            }
+//
+//            // Tworzenie i wyświetlanie okna dialogowego
+//            val dialog = builder.create()
+//            dialog.show()
+//            //Tylko do testowania notyfikacji na razie, bo jedyny wolny button, można usunąć
+////            sendNotification()
         }
 
         //Remindeers
         val buttonReminder = binding.buttonReminder
 
 
-        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
-            val reminder = note.reminder
+        intent.extras?.getParcelable<NoteWithLabels>(EXTRAS_NOTE)?.let { note ->
+            val reminder = note.note.reminder
             if (reminder != null) { //Sprawdza czy przypomnienie nie jest puste i na podstawie tego wyświetla je, albo nie
                 if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
                     buttonReminder.visibility = View.VISIBLE
@@ -108,11 +151,12 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 }
             }
 
-            if(note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
+            if(note.note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
                 binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
             } else {
                 binding.archiveButton.setImageResource(R.drawable.ic_archive)
             }
+
         }
 
         val buttonAddReminder = binding.buttonAddReminder
@@ -137,7 +181,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             calendar.set(Calendar.YEAR, year)
             formatterReminder(calendar)
 
-            val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.UK)
+            val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             reminder.date = formatterDate.format(calendar.time)
         }
 
@@ -166,34 +210,28 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         //Notatka głosowa
         binding.voiceButton.setOnClickListener {
-            // on below line we are calling speech recognizer intent.
+
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
 
-            // on below line we are passing language model
-            // and model free form in our intent
+
             intent.putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
 
-            // on below line we are passing our
-            // language as a default language.
+
             intent.putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE,
                 Locale.getDefault()
             )
 
-            // on below line we are specifying a prompt
-            // message as speak to text on below line.
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
 
-            // on below line we are specifying a try catch block.
-            // in this block we are calling a start activity
-            // for result method and passing our result code.
+
             try {
                 startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
             } catch (e: Exception) {
-                // on below line we are displaying error message in toast
+
                 Toast
                     .makeText(
                         this, " " + e.message,
@@ -207,7 +245,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         binding.imageButon.setOnClickListener{   pickImg() }
         binding.photoButton.setOnClickListener  { takePhoto() }
 
-
+        binding.noteImg.visibility = View.GONE
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             showData(note)
             edit = true
@@ -231,7 +269,12 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             binding.returnButton.setOnClickListener{
                 note.title = binding.inputTitle.text.toString()
                 note.content = binding.inputDesc.text.toString()
-                note.image = selectedImg
+                if (selectedImg == ""){
+                    note.image = note.image.toString()
+                }else{
+                    note.image = selectedImg
+                }
+
                 if(reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ){
                     note.reminder = reminder
                 } else {
@@ -246,8 +289,6 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 finish()
             }
         }
-
-        binding.noteImg.visibility = View.GONE
     }
 
 
@@ -272,16 +313,17 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         }
         if (requestCode == REQUEST_CODE_IMAGE_CAPTURE) {
-            Toast.makeText(this, "Picture saved to: $photoPath", Toast.LENGTH_SHORT).show()
-
-
 
             val bmOptions = BitmapFactory.Options()
             var bitmap = BitmapFactory.decodeFile(photoPath, bmOptions)
+            if (bitmap != null){
+                binding.noteImg.setImageBitmap(bitmap)
+                binding.noteImg.visibility = View.VISIBLE
+                selectedImg = photoPath
+            }else{
+                Toast.makeText(this, "Nie wykonano zdjęcia", Toast.LENGTH_SHORT).show()
+            }
 
-            binding.noteImg.setImageBitmap(bitmap)
-            binding.noteImg.visibility = View.VISIBLE
-            selectedImg = photoPath
 
         }
 
@@ -365,16 +407,16 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     private fun addNote() : Boolean{
         val title = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
-        val img = selectedImg
+        var img = selectedImg
+
+
         val label = null
         val notification = null
-
-
 
         if (validateNote(title, desc)){
 
             val note = Note( null,title,desc, img, false, notification,"13 gru, 2022 21:00")
-
+            val noteWithlabels = NoteWithLabels(note, listOf(Label(null, "Etykietka")))
             runOnUiThread { repository.insertNoteToDabase(note) }
             return true
         }
@@ -403,14 +445,17 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
     private fun showData(note: Note){
 
-        if (note.image != ""){
-            binding.noteImg.visibility = View.VISIBLE
-        }
-        else{
-            binding.noteImg.visibility = View.GONE
-        }
+
         binding.inputTitle.setText(note.title)
         binding.inputDesc.setText(note.content)
+        val bmOptions = BitmapFactory.Options()
+        var bitmap = BitmapFactory.decodeFile(note.image, bmOptions)
+        if (bitmap != null) {
+            binding.noteImg.setImageBitmap(bitmap)
+            binding.noteImg.visibility = View.VISIBLE
+        }else{
+            binding.noteImg.visibility = View.GONE
+        }
     }
 
     private fun pickImg(){
@@ -474,15 +519,63 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
     private fun createImageFile(): File {
         val timeStamp: String = SimpleDateFormat("dd.MM.yyyy HH:mm").format(Date())
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "JPEG_${timeStamp}_",
-            ".jpg",
-            storageDir
+        val storageDir: File? = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        return  File(
+            storageDir,
+            "$timeStamp.jpg"
         ).apply {
             photoPath = absolutePath
         }
     }
+
+    private fun showAddLabelDialog() {
+
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        val labels = repository.getLabelsForDialog()
+        for (label in labels) {
+            val checkBox = CheckBox(this)
+            checkBox.text = label.name
+            layout.addView(checkBox)
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Wybierz etykiety")
+            .setView(layout)
+            .setPositiveButton("OK") { _, _ ->
+                val selectedLabels = ArrayList<Label>()
+                for (i in 0 until layout.childCount) {
+                    val checkBox = layout.getChildAt(i) as CheckBox
+                    if (checkBox.isChecked) {
+                        selectedLabels.add(labels[i])
+                    }
+                }
+                showSelectedLabels(selectedLabels)
+
+
+            }
+            .setNegativeButton("ZAMKNIJ", null)
+            .create()
+        dialog.show()
+    }
+    private fun showSelectedLabels(labels: List<Label>){
+        val layout = LinearLayout(this)
+
+        layout.layoutParams  = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+         var params : LinearLayout.LayoutParams = layout.layoutParams as LinearLayout.LayoutParams
+        params.setMargins(20,0,0,0)
+        for (label in labels) {
+            val textView = TextView(this)
+            textView.text = label.name
+            textView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
+            textView.setPadding(8,8,8,8)
+            textView.layoutParams = params
+            layout.addView(textView)
+        }
+
+        binding.labelLayout.addView(layout)
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

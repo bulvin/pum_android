@@ -1,6 +1,7 @@
 package pl.notatki.repository
 
 import android.content.Context
+import androidx.room.Transaction
 import pl.notatki.database.DatabaseProvider
 import pl.notatki.model.Label
 import pl.notatki.model.Note
@@ -27,6 +28,11 @@ class NoteRepository(context: Context) {
             callback(database.noteDao().getNotes())
         }
     }
+    fun getAll(callback: (List<NoteWithLabels>) -> Unit){
+        executor.execute {
+            callback(database.noteDao().getAll())
+        }
+    }
     fun delete(note: Note){
         executor.execute { database.noteDao().delete(note) }
     }
@@ -51,4 +57,12 @@ class NoteRepository(context: Context) {
     fun updateLabel(label: Label){
         executor.execute { database.noteDao().updateLabel(label) }
     }
+
+    fun getLabelsForDialog() : List<Label> {
+        return database.noteDao().getLabelForDialog()
+
+
+    }
+
+
 }
