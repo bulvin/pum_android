@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 //import androidx.appcompat.widget.SearchView
 import android.widget.SearchView
 import android.app.SearchManager;
-
 import android.widget.SearchView.OnQueryTextListener;
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -15,7 +14,6 @@ import pl.notatki.R
 import pl.notatki.adapter.MainAdapter
 import pl.notatki.databinding.ActivityMainBinding
 import pl.notatki.model.Note
-import pl.notatki.model.NoteWithLabels
 import pl.notatki.repository.NoteRepository
 
 
@@ -104,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadReminderNotes(){
         val value = intent.getStringExtra("info")
-        repository.getAll { noteList: List<NoteWithLabels> ->
+        repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
                 adapter.setNotesReminders(noteList)
             }
@@ -124,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadArchiveNotes(){
         val value = intent.getStringExtra("info")
-        repository.getAll { noteList: List<NoteWithLabels> ->
+        repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
                 adapter.setNotesArchive(noteList)
             }
@@ -144,7 +142,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadSearchNotes(searched: String){
         val value = intent.getStringExtra("info")
-        repository.getAll { noteList: List<NoteWithLabels> ->
+        repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
                 adapter.setNotesSearch(noteList, searched)
             }
@@ -165,7 +163,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadNotes() {
 
         val value = intent.getStringExtra("info")
-        repository.getAll { noteList: List<NoteWithLabels> ->
+        repository.getNotes { noteList: List<Note> ->
             runOnUiThread {
                 adapter.setNotes(noteList)
             }

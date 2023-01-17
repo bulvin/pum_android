@@ -23,6 +23,8 @@ data class Note(
     var image: String?,
     var archived: Boolean,
     @Embedded
+    var label: Label,
+    @Embedded
     var reminder: Reminder?,
     var updated_at: String?,
 

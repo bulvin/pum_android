@@ -61,7 +61,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     companion object {
         const val EXTRAS_NOTE = "EXTRAS_NOTE"
 
-        fun start(activity: Activity, note: NoteWithLabels) {
+        fun start(activity: Activity, note: Note) {
             val intent = Intent(activity, NoteActivity::class.java)
             intent.putExtra(EXTRAS_NOTE, note)
             activity.startActivity(intent)
@@ -91,49 +91,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
 
 
-
-
         var labels = ArrayList<Label>()
 
         val buttonAddLabel = binding.buttonAddTags
        binding.buttonAddTags.setOnClickListener  {
 
            showAddLabelDialog()
-//           val builder = AlertDialog.Builder(this)
-//           builder.setTitle("Wybierz etykiety")
-//
-//           val checkBoxes = ArrayList<CheckBox>()
-//           val layout = LinearLayout(this)
-//           val listView = ListView(this)
-//           listView.addView(layout)
-//
-//
-//
-//            layout.orientation = LinearLayout.VERTICAL
-//
-//            for (label in labels) {
-//                val checkBox = CheckBox(this)
-//                checkBox.text = label.toString()
-//                layout.addView(checkBox)
-//                checkBoxes.add(checkBox)
-//            }
-//            builder.setView(listView)
-//
-//
-//            builder.setPositiveButton("OK") { _, _ ->
-//                val selectedLabels = StringBuilder()
-//                for (i in checkBoxes.indices) {
-//                    if (checkBoxes[i].isChecked) {
-//                        selectedLabels.append(labels[i]).append(" ")
-//                    }
-//                }
-//                binding.textNoteLabel.text = selectedLabels.toString()
-//                binding.textNoteLabel.visibility = View.VISIBLE
-//            }
-//
-//            // Tworzenie i wyświetlanie okna dialogowego
-//            val dialog = builder.create()
-//            dialog.show()
+
 //            //Tylko do testowania notyfikacji na razie, bo jedyny wolny button, można usunąć
 ////            sendNotification()
         }
@@ -142,8 +106,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         val buttonReminder = binding.buttonReminder
 
 
-        intent.extras?.getParcelable<NoteWithLabels>(EXTRAS_NOTE)?.let { note ->
-            val reminder = note.note.reminder
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            val reminder = note.reminder
             if (reminder != null) { //Sprawdza czy przypomnienie nie jest puste i na podstawie tego wyświetla je, albo nie
                 if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "" ) {
                     buttonReminder.visibility = View.VISIBLE
@@ -151,7 +115,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 }
             }
 
-            if(note.note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
+            if(note.archived == true){ //Przy ładowaniu sprawdza czy jest archiwizowana, żeby ustalić odpowiednią ikonę
                 binding.archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
             } else {
                 binding.archiveButton.setImageResource(R.drawable.ic_baseline_archive_24)
@@ -415,8 +379,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         if (validateNote(title, desc)){
 
-            val note = Note( null,title,desc, img, false, notification,"13 gru, 2022 21:00")
-            val noteWithlabels = NoteWithLabels(note, listOf(Label(null, "Etykietka")))
+            val note = Note( null,title,desc, img, false, Label(null, "Test"),notification,"13 gru, 2022 21:00")
+
             runOnUiThread { repository.insertNoteToDabase(note) }
             return true
         }

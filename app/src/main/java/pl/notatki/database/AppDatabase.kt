@@ -6,7 +6,7 @@ import pl.notatki.model.Label
 import pl.notatki.model.Note
 import pl.notatki.model.NoteLabelCrossRef
 
-@Database(entities = [Note::class, Label::class, NoteLabelCrossRef::class], version = 3, exportSchema = false)
+@Database(entities = [Note::class, Label::class, NoteLabelCrossRef::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun noteDao(): NoteDAO
