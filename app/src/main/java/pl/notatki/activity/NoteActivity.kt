@@ -254,9 +254,9 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                     createNotificationChannel();
                     //function for scheduling the notification
                     scheduleNotification(calendar);
-                } /*else {
+                } else {
                     note.reminder = null
-                }*/
+                }
 
                 updateNote(note)
                 val main = Intent(this, MainActivity::class.java)
@@ -444,6 +444,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         val label = null
         val notification = null
+
+
 
         if (validateNote(title, desc)){
 
