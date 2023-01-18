@@ -73,6 +73,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         binding = ActivityNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val calendar = Calendar.getInstance()
 
         //createNotificationChannel()
 
@@ -82,7 +83,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         buttonNoteActivity.setOnClickListener {
             val main = Intent(this, MainActivity::class.java)
             val message: String
-            if (addNote() && !edit) {
+            if (addNote(calendar) && !edit) {
                 message = "Notatka została zapisana"
             } else {
                 message = "Notatka nie została zapisana"
@@ -127,7 +128,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         val buttonAddReminder = binding.buttonAddReminder
         val reminder = Reminder("", "", "")
 
-        val calendar = Calendar.getInstance()
+
 
         //Wybieranie czasu
         val timePicker = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
@@ -436,20 +437,24 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
     }
 
-    private fun addNote() : Boolean{
+    private fun addNote(calendar : Calendar) : Boolean{
         val title = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
         var img = selectedImg
 
 
         val label = null
-        val notification = null
 
-
+        //Dodawanie notyfikacji przy tworzeniu
+        val reminder = Reminder("", "", "")
+        val formatterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        reminder.timeReminder = formatterTime.format(calendar.time)
+        val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
+        reminder.date = formatterDate.format(calendar.time)
 
         if (validateNote(title, desc)){
 
-            val note = Note( 0,title,desc, img, false, Label(null, "Test"),notification,"13 gru, 2022 21:00")
+            val note = Note( 0,title,desc, img, false, Label(null, "Test"),reminder,"13 gru, 2022 21:00")
 
             runOnUiThread { repository.insertNoteToDabase(note) }
             return true
