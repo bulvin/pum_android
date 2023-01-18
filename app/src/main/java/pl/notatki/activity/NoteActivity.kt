@@ -145,7 +145,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             //val pos = ParsePosition(0)+
             //val stringDate: Date = formatter.parse(dateFull, pos)
 
-            if( dateT != null && timeT != null){
+            if( dateT != "" || timeT != ""){
                 calendar.setTime(formatter.parse(dateFull))
             }
         }
