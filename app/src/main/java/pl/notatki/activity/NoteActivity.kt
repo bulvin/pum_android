@@ -30,9 +30,9 @@ import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
 import java.io.IOException
-import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
+//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 
 class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,EasyPermissions.RationaleCallbacks {
@@ -142,15 +142,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
             Log.v("Testing", "dateFull =" + dateFull);
 
-            //val pos = ParsePosition(0)
+            //val pos = ParsePosition(0)+
             //val stringDate: Date = formatter.parse(dateFull, pos)
 
             if( dateT != null && timeT != null){
                 calendar.setTime(formatter.parse(dateFull))
             }
         }
-
-
 
         //Wybieranie czasu
         val timePicker = TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
@@ -162,17 +160,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             reminder.timeReminder = formatterTime.format(calendar.time)
         }
 
-
-        Log.v("Testing", "Rok =" + calendar[Calendar.YEAR]);
-        Log.v("Testing", "Miesiąc =" + calendar[Calendar.MONTH]);
-        Log.v("Testing", "Dzień =" + calendar[Calendar.DAY_OF_MONTH]);
+        val c = Calendar.getInstance() //Pobiera obecny czas
 
         val datePicker = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
 
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.YEAR, year)
-
 
             val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
             reminder.date = formatterDate.format(calendar.time)
@@ -197,9 +191,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         //Otwiera date i time pickery
         buttonReminder.setOnClickListener {
             DatePickerDialog(
-                this, datePicker, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.YEAR)
-            ).show()
+                this, datePicker, c[Calendar.YEAR] , c[Calendar.MONTH] ,c[Calendar.DAY_OF_MONTH]
+            )   .show()
 
             TimePickerDialog(
                 this, timePicker, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
