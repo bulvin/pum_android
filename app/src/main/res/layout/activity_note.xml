@@ -243,7 +243,7 @@
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center|fill_vertical"
-                android:src="@drawable/ic_archive"
+                android:src="@drawable/ic_baseline_archive_24"
                 android:text="Add"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/delete_button"

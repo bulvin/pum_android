@@ -73,6 +73,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         setContentView(binding.root)
         val calendar = Calendar.getInstance()
 
+        var reminder = Reminder(" ","","")
+
         //createNotificationChannel()
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -81,7 +83,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         buttonNoteActivity.setOnClickListener {
             val main = Intent(this, MainActivity::class.java)
             val message: String
-            if (addNote(calendar) && !edit) {
+            if (addNote(calendar, reminder) && !edit) {
                 message = "Notatka została zapisana"
             } else {
                 message = "Notatka nie została zapisana"
@@ -129,7 +131,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         }
 
         //Ustawianie remindera i calendara na odpowiednie wartości
-        val reminder = Reminder("", "", "")
+        reminder = Reminder("", "", "")
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             reminder.timeReminder = note.reminder?.timeReminder ?: ""
             reminder.date = note.reminder?.date ?: ""
@@ -254,6 +256,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             }
 
             binding.deleteButton.setOnClickListener {
+                cancelNotification(calendar)
                 deleteNote(note)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
@@ -280,6 +283,9 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
                 if(reminder.timeReminder == "" || reminder.date == ""){
                     note.reminder = null
+                    notificationManager.cancel(note.noteId)
+                    cancelNotification(calendar)
+                    Log.d("Test","Usuwanie notyfikacji o ID: "+note.noteId+1)
                 }
 
 
@@ -332,7 +338,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         }
 
-        //Część do notatki głosowej
+        //Część do notatki głosowej. Notatka głosowa
         // in this method we are checking request
         // code with our result code.
         if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
@@ -379,13 +385,41 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         manager.createNotificationChannel(channel)
     }
 
+    fun cancelNotification(calendar: Calendar){
+        val intent = Intent(applicationContext, NotificationReceiver::class.java)
+        val delete = 1
+
+        intent.putExtra("deleteExtra", delete)
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            intent.putExtra("notificationExtra", note.noteId!!)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            1,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            1000,
+            pendingIntent
+        )
+
+        //Toast.makeText(applicationContext, "Usunięto przypomnienie", Toast.LENGTH_LONG).show()
+    }
+
     fun scheduleNotification(calendar: Calendar) {
         val name = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
 
         val intent = Intent(applicationContext, NotificationReceiver::class.java)
+        val delete = 0
         intent.putExtra("titleExtra", name)
         intent.putExtra("textExtra", desc)
+        intent.putExtra("deleteExtra", delete)
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             intent.putExtra("notificationExtra", note.noteId!!)
         }
@@ -402,6 +436,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         //calendarTest.add(Calendar.SECOND, 30)
 
         val date: Date = calendar.getTime()
+        date.seconds = 0
         val longDate: Long = date.getTime()
 
         val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
@@ -416,48 +451,9 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         val format = SimpleDateFormat("HH:mm dd-MM-yyyy")
         var time = format.format(calendar.getTime())
 
-        Toast.makeText(applicationContext, time, Toast.LENGTH_LONG).show()
+
+        Toast.makeText(applicationContext, "Przypomnienie ustawione na: "+time, Toast.LENGTH_LONG).show()
     }
-
-    //Działająca notyfikacja
-    /*private fun sendNotification(calendar: Calendar) {
-        val name = binding.inputTitle.text.toString()
-        val desc = binding.inputDesc.text.toString()
-
-        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
-            val reminder = note.reminder
-
-            //val hour = reminder?.timeReminder.toString()
-            //val date = reminder?.date.toString()
-
-            var notificationID = 101
-            notificationID = note.noteId!!
-
-            val intent = Intent(this, MainActivity::class.java)
-            val pendingIntent =
-                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationChannel =
-                    NotificationChannel(channelID, name, NotificationManager.IMPORTANCE_HIGH)
-                notificationManager.createNotificationChannel(notificationChannel)
-
-                builder = Notification.Builder(this, channelID)
-                    .setContentTitle(name)
-                    .setContentText(desc)
-                    .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                    .setContentIntent(pendingIntent)
-            } else {
-                builder = Notification.Builder(this)
-                    .setContentTitle(name)
-                    .setContentText(desc)
-                    .setSmallIcon(com.google.android.material.R.drawable.ic_clock_black_24dp)
-                    .setContentIntent(pendingIntent)
-            }
-
-            notificationManager.notify(notificationID, builder.build())
-        }
-    }*/
 
     private fun formatterReminder(calendar: Calendar) {
         val formatter = SimpleDateFormat("HH:mm dd-MM-yyyy")
@@ -468,7 +464,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
     }
 
-    private fun addNote(calendar : Calendar) : Boolean{
+    private fun addNote(calendar : Calendar, reminder : Reminder) : Boolean{
         val title = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
         var img = selectedImg
@@ -477,11 +473,26 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         val label = null
 
         //Dodawanie notyfikacji przy tworzeniu
-        val reminder = Reminder("", "", "")
-        val formatterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
-        reminder.timeReminder = formatterTime.format(calendar.time)
-        val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
-        reminder.date = formatterDate.format(calendar.time)
+        //val reminder = Reminder("", "", "")
+
+        if (reminder.timeReminder != "" && reminder.date != "") {
+
+            val formatterTime = SimpleDateFormat("HH:mm", Locale.ENGLISH)
+            reminder.timeReminder = formatterTime.format(calendar.time)
+            val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
+            reminder.date = formatterDate.format(calendar.time)
+
+            //function for Creating [Notification Channel][1]
+            createNotificationChannel();
+            //function for scheduling the notification
+            scheduleNotification(calendar);
+        }
+
+        if(reminder.timeReminder == "" || reminder.date == ""){
+            cancelNotification(calendar)
+        }
+
+
 
         //function for Creating [Notification Channel][1]
         createNotificationChannel();
