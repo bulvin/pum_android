@@ -30,6 +30,7 @@ import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
 import java.io.IOException
+import java.text.ParsePosition
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -127,10 +128,26 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         }
 
+        //Ustawianie remindera i calendara na odpowiednie wartości
         val reminder = Reminder("", "", "")
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             reminder.timeReminder = note.reminder?.timeReminder ?: ""
             reminder.date = note.reminder?.date ?: ""
+
+            val formatter = SimpleDateFormat("HH:mm dd.MM.yyyy")
+
+            var dateT = note.reminder?.timeReminder ?: ""
+            var timeT = note.reminder?.date ?: ""
+            var dateFull = dateT+" "+timeT
+
+            Log.v("Testing", "dateFull =" + dateFull);
+
+            //val pos = ParsePosition(0)
+            //val stringDate: Date = formatter.parse(dateFull, pos)
+
+            if( dateT != null && timeT != null){
+                calendar.setTime(formatter.parse(dateFull))
+            }
         }
 
 
@@ -155,10 +172,11 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.YEAR, year)
-            formatterReminder(calendar)
+
 
             val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
             reminder.date = formatterDate.format(calendar.time)
+            formatterReminder(calendar)
         }
 
         //Usuwanie powiadomienia reminder
