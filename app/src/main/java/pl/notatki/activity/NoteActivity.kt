@@ -8,7 +8,6 @@ import android.content.Intent
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -101,7 +100,6 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
             showAddLabelDialog()
 
-//            //Tylko do testowania notyfikacji na razie, bo jedyny wolny button, można usunąć
         }
 
         //Remindeers
@@ -140,8 +138,15 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             reminder.timeReminder = formatterTime.format(calendar.time)
         }
 
-        //Wybieranie daty
+        val currentCalendar = Calendar.getInstance()
+        var mYear = currentCalendar[Calendar.YEAR]
+        var mMonth = currentCalendar[Calendar.MONTH]
+        var mDay = currentCalendar[Calendar.DAY_OF_MONTH]
+
+
+
         val datePicker = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.YEAR, year)
@@ -150,6 +155,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
             reminder.date = formatterDate.format(calendar.time)
         }
+
+
 
         //Dodaje przycisk Reminder
         buttonAddReminder.setOnClickListener {
@@ -182,7 +189,6 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         binding.voiceButton.setOnClickListener {
 
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-
 
             intent.putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -382,6 +388,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             pendingIntent
         )
 
+        //alarmManager.cancel(pendingIntent);
+
         val format = SimpleDateFormat("HH:mm dd-MM-yyyy")
         var time = format.format(calendar.getTime())
 
@@ -389,7 +397,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
     }
 
     //Działająca notyfikacja
-    private fun sendNotification(calendar: Calendar) {
+    /*private fun sendNotification(calendar: Calendar) {
         val name = binding.inputTitle.text.toString()
         val desc = binding.inputDesc.text.toString()
 
@@ -426,7 +434,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
             notificationManager.notify(notificationID, builder.build())
         }
-    }
+    }*/
 
     private fun formatterReminder(calendar: Calendar) {
         val formatter = SimpleDateFormat("HH:mm dd-MM-yyyy")
@@ -451,6 +459,11 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         reminder.timeReminder = formatterTime.format(calendar.time)
         val formatterDate = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
         reminder.date = formatterDate.format(calendar.time)
+
+        //function for Creating [Notification Channel][1]
+        createNotificationChannel();
+        //function for scheduling the notification
+        scheduleNotification(calendar);
 
         if (validateNote(title, desc)){
 
@@ -624,6 +637,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)){
             AppSettingsDialog.Builder(this).build().show()
         }
+    }
+
+    //Pobiera obecną datę
+    private fun currentdate(): Date? {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DATE, 0)
+        return cal.time
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
