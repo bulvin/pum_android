@@ -12,11 +12,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.View
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -102,9 +100,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         }
 
-        //Remindeers
         val buttonReminder = binding.buttonReminder
-
+        val buttonAddReminder = binding.buttonAddReminder
 
         intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
             val reminder = note.reminder
@@ -112,6 +109,13 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                 if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "") {
                     buttonReminder.visibility = View.VISIBLE
                     buttonReminder.text = reminder.timeReminder +" "+ reminder.date
+
+                    if (buttonReminder.visibility == View.VISIBLE) {
+                        buttonAddReminder.text = "Przypomnienie-"
+
+                    } else {
+                        buttonAddReminder.text = "Przypomnienie+"
+                    }
                 }
             }
 
@@ -123,8 +127,11 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
 
         }
 
-        val buttonAddReminder = binding.buttonAddReminder
         val reminder = Reminder("", "", "")
+        intent.extras?.getParcelable<Note>(EXTRAS_NOTE)?.let { note ->
+            reminder.timeReminder = note.reminder?.timeReminder ?: ""
+            reminder.date = note.reminder?.date ?: ""
+        }
 
 
 
@@ -138,12 +145,10 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             reminder.timeReminder = formatterTime.format(calendar.time)
         }
 
-        val currentCalendar = Calendar.getInstance()
-        var mYear = currentCalendar[Calendar.YEAR]
-        var mMonth = currentCalendar[Calendar.MONTH]
-        var mDay = currentCalendar[Calendar.DAY_OF_MONTH]
 
-
+        Log.v("Testing", "Rok =" + calendar[Calendar.YEAR]);
+        Log.v("Testing", "Miesiąc =" + calendar[Calendar.MONTH]);
+        Log.v("Testing", "Dzień =" + calendar[Calendar.DAY_OF_MONTH]);
 
         val datePicker = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
 
@@ -156,9 +161,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             reminder.date = formatterDate.format(calendar.time)
         }
 
-
-
-        //Dodaje przycisk Reminder
+        //Usuwanie powiadomienia reminder
         buttonAddReminder.setOnClickListener {
 
             if (buttonReminder.visibility == View.GONE) {
@@ -168,7 +171,8 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
             } else {
                 buttonReminder.visibility = View.GONE
                 buttonAddReminder.text = "Przypomnienie+"
-
+                reminder.timeReminder = ""
+                reminder.date = ""
             }
         }
 
@@ -252,7 +256,7 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                     note.image = selectedImg
                 }
 
-                if (reminder.timeReminder != "" || reminder.date != "" || reminder.location != "") {
+                if (reminder.timeReminder != "" && reminder.date != "") {
                     note.reminder = reminder
 
                     val formatter = SimpleDateFormat("HH:mm dd-MM-yyyy")
@@ -261,9 +265,17 @@ class NoteActivity : AppCompatActivity(),EasyPermissions.PermissionCallbacks,Eas
                     createNotificationChannel();
                     //function for scheduling the notification
                     scheduleNotification(calendar);
-                } else {
+                }
+
+                if(reminder.timeReminder == "" || reminder.date == ""){
                     note.reminder = null
                 }
+
+
+
+                /*else {
+                    note.reminder = null
+                }*/
 
                 updateNote(note)
                 val main = Intent(this, MainActivity::class.java)
